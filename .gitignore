@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing/Coverage
+coverage/
+
+# Build outputs
+dist/
+build/
+.turbo/
+.next/
+out/
+.tsbuildinfo
+
+# Environment Variables
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE/Editor files
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# Payload CMS specific
+# (Only if you store your local DB files in the repo, 
+# which you should ideally avoid)
+*.sqlite
+*.sqlite-journal

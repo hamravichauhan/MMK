@@ -1,0 +1,16 @@
+@media (min-width: 1024px) {
+  .editorial-blueprint-grid {
+    grid-template-columns: 2.2fr 1.1fr !important;
+  }
+  .briefing-blueprint-side {
+    border-left: 1px solid rgba(30, 41, 59, 0.8) !important;
+    padding-left: 24px !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .briefing-blueprint-side {
+    border-left: none !important;
+    padding-left: 0 !important;
+  }
+}
