@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Major Madhan Kumar (MMK) Platform — Client Feature Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070A14;
+      --card-bg: #0F172A;
+      --card-border: #1E293B;
+      --accent: #EAB308;
+      --accent-glow: rgba(234, 179, 8, 0.15);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --gold: #D97706;
+      --red: #DC2626;
+      --green: #10B981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.65;
+      padding: 40px 20px 80px;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .print-btn {
+      background: #EAB308;
+      color: #000;
+      border: none;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .print-btn:hover {
+      background: #FACC15;
+      transform: translateY(-1px);
+    }
+    .hero-header {
+      text-align: center;
+      margin-bottom: 60px;
+      padding: 30px 20px;
+      background: radial-gradient(circle at center, rgba(30, 58, 138, 0.25) 0%, transparent 70%);
+    }
+    .hero-header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+    }
+    .hero-header h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .hero-header p {
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .executive-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 50px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .executive-card h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 24px;
+      color: var(--accent);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .executive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .exec-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      padding: 20px;
+      border-radius: 12px;
+    }
+    .exec-item h4 {
+      font-size: 16px;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .exec-item p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .feature-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 36px;
+      margin-bottom: 50px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      color: #FFFFFF;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .screenshot-frame {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      background: #000;
+      margin: 24px 0 28px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+    .screenshot-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .feature-box {
+      background: rgba(30, 41, 59, 0.4);
+      border-left: 3px solid var(--accent);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+    }
+    .feature-box strong {
+      display: block;
+      color: #F8FAFC;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .feature-box span {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+    }
+    th, td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 14px;
+    }
+    th {
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--accent);
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+    td strong {
+      color: #FFFFFF;
+    }
+    td {
+      color: var(--text-muted);
+    }
+
+    .footer-note {
+      text-align: center;
+      padding: 40px 20px;
+      border-top: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+        padding: 0;
+      }
+      .top-actions {
+        display: none;
+      }
+      .executive-card, .feature-section {
+        background: #fff;
+        border: 1px solid #ddd;
+        box-shadow: none;
+        page-break-inside: avoid;
+        color: #000;
+      }
+      .section-title, .hero-header h1 {
+        color: #000;
+      }
+      .section-subtitle, .feature-box span, .exec-item p {
+        color: #444;
+      }
+      .feature-box {
+        background: #f8f8f8;
+        border-left: 3px solid #b45309;
+      }
+      .screenshot-frame {
+        border: 1px solid #ccc;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="top-actions">
+      <div class="badge-pill">★ Strategic Platform Briefing</div>
+      <button class="print-btn" onclick="window.print()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print or Save as PDF
+      </button>
+    </div>
+
+    <header class="hero-header">
+      <h1>Major Madhan Kumar (MMK)</h1>
+      <h2>Executive Platform Presentation & Feature Showcase</h2>
+      <p>A high-performance digital authority, defense news, and multimedia platform engineered for Major Madhan Kumar (Retd). Designed to scale to multi-million readers, honor Indian Armed Forces personnel, and automate content distribution.</p>
+    </header>
+
+    <!-- Executive Pillars -->
+    <div class="executive-card">
+      <h3>🏛 Core Executive Value Pillars</h3>
+      <p>This platform transitions Major Madhan Kumar from being dependent on third-party algorithms to owning a sovereign, institutional media property.</p>
+      <div class="executive-grid">
+        <div class="exec-item">
+          <h4>🎖 Sovereign Authority</h4>
+          <p>Elevates Major Madhan Kumar alongside primary defense publications (*Firstpost, Foreign Policy*) with verified citations and strategic dispatches.</p>
+        </div>
+        <div class="exec-item">
+          <h4>🇮🇳 Armed Forces Honor</h4>
+          <p>Houses India's premier digital memorial (*"Know Your Soldiers"*), documenting citations and valor of living veterans and martyrs.</p>
+        </div>
+        <div class="exec-item">
+          <h4>⚡ Zero-Effort Automation</h4>
+          <p>YouTube debates and speeches automatically sync into video libraries with real-time views and thumbnails—no manual uploads needed.</p>
+        </div>
+        <div class="exec-item">
+          <h4>💰 Revenue & Direct Sales</h4>
+          <p>Built-in showcases for *Operation Sindoor* book sales, *Making The Unbreakable* documentary streaming, and official MMK merchandise.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 01 Homepage -->
+    <div class="feature-section">
+      <h2 class="section-title">1. The Homepage: Firstpost-Style Media Hub</h2>
+      <p class="section-subtitle">A high-density strategic news front page designed to command immediate trust and convey real-time authority.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/01_homepage_hero.png" alt="Homepage Hero Section">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Live Breaking News Ticker</strong>
+          <span>Real-time tactical alerts and international briefs scrolling at the very top of the screen.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Spotlight Analysis Hero</strong>
+          <span>Dominant feature story placement emphasizing Major Madhan Kumar's primary analysis of the day.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Strategic Topic Pills</strong>
+          <span>Instant navigation into #BorderSecurity, #OSINT, #NavalWarfare, and #CareerGuidance.</span>
+        </div>
+        <div class="feature-box">
+          <strong>850,000+ Follower Social Proof</strong>
+          <span>Reinforces massive digital authority to delegates, event organizers, and journalists.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 Strategic Promos -->
+    <div class="feature-section">
+      <h2 class="section-title">2. Commercial Engine: Books, Documentaries & Gear</h2>
+      <p class="section-subtitle">High-visibility promotional cards embedded naturally into the news stream to monetize audience trust.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/02_homepage_promos.png" alt="Strategic Homepage Promos">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Operation Sindoor Bestseller Card</strong>
+          <span>Dynamic book card highlighting Hardcover, Kindle, and Audiobook with direct 1-click external buy links.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Documentary Showcase</strong>
+          <span>Preview card for "Making The Unbreakable" with trailer duration and direct YouTube streaming redirect.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Official Merchandise Preview</strong>
+          <span>Spotlight gear card displaying tactical gear with formatted INR prices and direct store routing.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Exclusive Subscriber Ribbons</strong>
+          <span>Distinct visual treatment for in-depth subscriber intelligence and declassified dispatches.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 Articles Hub -->
+    <div class="feature-section">
+      <h2 class="section-title">3. Geopolitical Analysis & News Feed</h2>
+      <p class="section-subtitle">A complete searchable archive of defense dispatches, foreign affairs assessments, and career guidance.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/03_articles_hub.png" alt="Articles Hub">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Live Search Matrix</strong>
+          <span>Readers can find any past briefing by headline, keyword, or military topic instantly.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Categorized Editorial Navigation</strong>
+          <span>One-click tabs across Geopolitics, Defence, Blog Feed, and Career Guidance.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Multilingual Architecture</strong>
+          <span>Pre-configured infrastructure ready for English, Hindi, and Tamil regional editions.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Read-Time & Date Indicators</strong>
+          <span>Shows readers estimated reading duration upfront for better engagement.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 Article Reader -->
+    <div class="feature-section">
+      <h2 class="section-title">4. Distraction-Free Article Reading & PDF Citations</h2>
+      <p class="section-subtitle">Academic and defense publication-grade reading layout with one-click export for research and press.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/04_article_reader.png" alt="Article Reader View">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Distraction-Free Layout</strong>
+          <span>Clean reading typography with generous whitespace and zero intrusive advertising.</span>
+        </div>
+        <div class="feature-box">
+          <strong>1-Click Print & PDF Citation Button</strong>
+          <span>Journalists and researchers can save or print verified citations of Major Madhan Kumar's writings.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Author Dossier Attribution</strong>
+          <span>Major Madhan Kumar's credential badge and verified military background accompany every brief.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 Know Your Soldiers -->
+    <div class="feature-section">
+      <h2 class="section-title">5. "Know Your Soldiers" Armed Forces Memorial</h2>
+      <p class="section-subtitle">A pioneering digital archive honoring living veterans and fallen heroes of India's Armed Forces.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/05_know_your_soldiers.png" alt="Know Your Soldiers Archive">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Advanced Multi-Filter Search</strong>
+          <span>Filter dynamically by Branch (Army, Navy, Air Force, Para SF), Military Rank, and Home State.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Roll of Honour Categories</strong>
+          <span>Dedicated filters for Veer Gatha (Supreme Sacrifice Martyrs) vs. Living Decorated Veterans.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Gallantry Decoration Badges</strong>
+          <span>Visual badges for Param Vir Chakra (PVC), Ashoka Chakra, Vir Chakra, and Sena Medal.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 Soldier Tribute -->
+    <div class="feature-section">
+      <h2 class="section-title">6. Veer Gatha Hero Tribute Profile</h2>
+      <p class="section-subtitle">Dedicated tribute pages documenting heroic operations, medals, battle mottos, and detailed biographies.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/06_soldier_tribute.png" alt="Captain Vikram Batra Profile">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Veer Gatha Hero Framing</strong>
+          <span>Distinctive ceremonial red and gold borders honoring fallen heroes.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Official Military Registry</strong>
+          <span>Regiment/Unit (e.g. 13 JAK RIF), Home State, Service Timeline, and Operation details.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Printable Tribute Citation</strong>
+          <span>Formatted for school libraries, educational seminars, and patriotic commemorations.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 Video Library -->
+    <div class="feature-section">
+      <h2 class="section-title">7. Multimedia & Automated Video Library</h2>
+      <p class="section-subtitle">Aggregates TV debates, keynote addresses, and YouTube interviews automatically without manual uploading.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/07_video_library.png" alt="Video Library">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Automatic YouTube Sync</strong>
+          <span>Pulls YouTube video titles, high-res thumbnails, and views on the fly—zero server storage needed.</span>
+        </div>
+        <div class="feature-box">
+          <strong>3-Column Responsive Grid</strong>
+          <span>Clean cards with play buttons and instant modal/inline player support.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Category Playlists</strong>
+          <span>Filter videos across Geopolitics, Defence, Motivation, and SSB Career Coaching.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 Merchandise Store -->
+    <div class="feature-section">
+      <h2 class="section-title">8. Official MMK Merchandise Store</h2>
+      <p class="section-subtitle">A high-end patriotic merchandise storefront to monetize follower support with official gear.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/08_merchandise_store.png" alt="Merchandise Store">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Tactical Product Catalog</strong>
+          <span>Siachen Commando Hoodies, Field Tees, Commando Caps, EDC Pouches, and Challenge Coins.</span>
+        </div>
+        <div class="feature-box">
+          <strong>INR Prices & Inventory Badges</strong>
+          <span>Prices formatted in Rupees (₹) with smart "OUT OF STOCK" tags for sold-out products.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Flexible Direct Routing</strong>
+          <span>Links directly to Amazon, Shopify, or brand fulfillment partners, ready for native checkout.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 09 Events & Conclaves -->
+    <div class="feature-section">
+      <h2 class="section-title">9. Strategic Conclaves & Events Calendar</h2>
+      <p class="section-subtitle">Public speaking, defense summits, and masterclasses calendar with real-time registration toggles.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/09_events_conclaves.png" alt="Events and Conclaves">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Chronological Filtering</strong>
+          <span>Organizes sessions into Upcoming Events, Past Events, and All Initiatives.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Dynamic Registration Badges</strong>
+          <span>Shows "OPEN" or "CLOSED" admission status in real time.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Full Logistics Dossier</strong>
+          <span>Date, time, venue auditorium (e.g. Manekshaw Centre, New Delhi), and direct delegate signup button.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 Photo Gallery -->
+    <div class="feature-section">
+      <h2 class="section-title">10. Photo Gallery & Field Archives</h2>
+      <p class="section-subtitle">Curated visual archive of high-altitude military border inspections, conclaves, and award ceremonies.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/10_photo_gallery.png" alt="Photo Gallery">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Event-Based Albums</strong>
+          <span>Organized into photo sets covering NDA parades, TV debate panels, and border inspections.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Interactive Lightbox</strong>
+          <span>Full-screen high-definition photo viewing with smooth keyboard navigation and captions.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Instant Cloud Delivery</strong>
+          <span>Optimized WebP compression ensures lightning-fast loading without slowing down page navigation.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11 About & Media Kit -->
+    <div class="feature-section">
+      <h2 class="section-title">11. Authority Hub & Media Press Kit</h2>
+      <p class="section-subtitle">Biography, military leadership record, media citations, and one-click press kit download.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/11_about_major_madhan.png" alt="About Major Madhan Kumar">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Comprehensive Biography</strong>
+          <span>Spans Indian Army tactical command, corporate leadership, and nationwide strategic literacy.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Media Citations & TV Debates</strong>
+          <span>Highlights broadcast appearances, policy analysis, and keynote addresses.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Downloadable Press Kit PDF</strong>
+          <span>Single-click download for conference organizers, TV producers, and academic institutions.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12 Contact Portal -->
+    <div class="feature-section">
+      <h2 class="section-title">12. Strategic Communications & Speaking Desk</h2>
+      <p class="section-subtitle">Direct institutional portal for keynote speaking invitations, TV media requests, and defense advisory.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/12_contact_portal.png" alt="Contact Portal">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Departmental Routing</strong>
+          <span>Separates Keynotes (speaking@), TV Debates (media@), and Strategic Advisory (advisory@).</span>
+        </div>
+        <div class="feature-box">
+          <strong>Structured Requisition Brief</strong>
+          <span>Captures organization name, inquiry category, event dates, and expected audience size.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Automated Inbox Delivery & Spam Defense</strong>
+          <span>Submissions are logged into the database and dispatched directly to management email.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13 Admin Command Center -->
+    <div class="feature-section">
+      <h2 class="section-title">13. The Admin Command Center: 100% Code-Free Control</h2>
+      <p class="section-subtitle">Major Madhan Kumar and his media team can update all content, sidebars, and settings without developers.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/13_admin_command_center.png" alt="Admin Command Center">
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Platform Area</th>
+            <th>What the Client Can Update Code-Free</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Articles & News</strong></td>
+            <td>Write new analyses, set breaking news alerts, select trending tags, and schedule publications.</td>
+          </tr>
+          <tr>
+            <td><strong>Soldier Memorial</strong></td>
+            <td>Add fallen martyrs and living veterans, upload portraits, and enter citations and regiments.</td>
+          </tr>
+          <tr>
+            <td><strong>Merchandise Store</strong></td>
+            <td>Add products, upload photos, set INR prices, and toggle "Out of Stock" or external buy links.</td>
+          </tr>
+          <tr>
+            <td><strong>Conclaves & Talks</strong></td>
+            <td>Add speaking events, set venues, times, and toggle registration open or closed.</td>
+          </tr>
+          <tr>
+            <td><strong>YouTube Sync</strong></td>
+            <td>Paste any YouTube link to immediately add videos, or click "Sync YouTube Channel".</td>
+          </tr>
+          <tr>
+            <td><strong>Global Site Settings</strong></td>
+            <td>Update social follower numbers (850k+), profile photos, and contact email addresses.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 14 Dark / Light Mode -->
+    <div class="feature-section">
+      <h2 class="section-title">14. Daytime Light Mode & Tactical Dark Mode</h2>
+      <p class="section-subtitle">Full system-wide contrast toggle allowing readers to enjoy long-form articles comfortably in any lighting.</p>
+      
+      <div class="screenshot-frame">
+        <img src="docs/screenshots/14_light_mode_homepage.png" alt="Light Mode Homepage">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>High-Contrast Light Mode</strong>
+          <span>Crisp white paper background with deep dark typography for daylight outdoor reading.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Tactical Dark Mode</strong>
+          <span>Deep navy and black tones designed for evening readers and high-focus research.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15 Mobile Experience -->
+    <div class="feature-section">
+      <h2 class="section-title">15. 100% Mobile Smartphone Elegance</h2>
+      <p class="section-subtitle">Engineered specifically for the 75%+ of Major Madhan Kumar's audience who visit from mobile phones.</p>
+      
+      <div style="max-width: 440px; margin: 24px auto;" class="screenshot-frame">
+        <img src="docs/screenshots/15_mobile_responsive_homepage.png" alt="Mobile Experience">
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-box">
+          <strong>Touch-Optimized Controls</strong>
+          <span>Finger-friendly category navigation and sliding news reels.</span>
+        </div>
+        <div class="feature-box">
+          <strong>Sub-Second Loading</strong>
+          <span>Lightweight WebP media formatting ensures pages open instantly even on cellular connections.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <p><strong>MMK Digital Platform (v2.0)</strong> — Engineered for Major Madhan Kumar (Retd)</p>
+      <p style="margin-top: 6px; font-size: 13px;">Official Personal Authority, High-Density News & Armed Forces Honor Memorial</p>
+    </div>
+
+  </div>
+
+</body>
+</html>
