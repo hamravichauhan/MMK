@@ -3,6 +3,9 @@ import { slugify } from '../utils/slugify'
 
 export const GalleryAlbums: CollectionConfig = {
   slug: 'gallery-albums',
+  access: {
+    read: () => true,
+  },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['visibility', 'name', 'event_date', 'updatedAt'],

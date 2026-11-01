@@ -3,6 +3,9 @@ import { slugify } from '../utils/slugify'
 
 export const Events: CollectionConfig = {
   slug: 'events',
+  access: {
+    read: () => true,
+  },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['registration_open', 'title', 'event_date', 'location_city', 'updatedAt'],

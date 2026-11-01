@@ -2,6 +2,9 @@ import { CollectionConfig } from 'payload'
 
 export const GalleryPhotos: CollectionConfig = {
   slug: 'gallery-photos',
+  access: {
+    read: () => true,
+  },
   admin: {
     useAsTitle: 'caption',
     // Displays image thumbnails directly inside the admin data rows for instant visual scanning
