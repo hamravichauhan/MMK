@@ -3,6 +3,7 @@ import configPromise from '@/payload.config'
 import Link from 'next/link'
 import type { Media } from '@/payload-types'
 import { format } from 'date-fns'
+import getCloudinaryUrl from '@/utils/mediaUrl'
 
 export const revalidate = 0
 
@@ -181,27 +182,11 @@ export default async function ArticlesListPage() {
                         overflow: 'hidden',
                       }}
                     >
-                      {image?.url ? (
-                        <img
-                          src={image.url}
-                          alt={image.alt || article.title}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#cbd5e1',
-                            fontSize: '14px',
-                          }}
-                        >
-                          No Featured Image Link
-                        </div>
-                      )}
+                      <img
+                        src={getCloudinaryUrl(image, 'drone-shield')}
+                        alt={image?.alt || article.title}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
 
                       {/* Bold Red Category Tag Badge Overlay */}
                       {article.category && (
@@ -271,7 +256,7 @@ export default async function ArticlesListPage() {
                           borderTop: '1px solid #f8fafc',
                           display: 'flex',
                           alignItems: 'center',
-                          justify: 'space-between',
+                          justifyContent: 'space-between',
                           fontSize: '13px',
                           color: '#94a3b8',
                           fontWeight: '500',

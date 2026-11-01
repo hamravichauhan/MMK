@@ -1,0 +1,55 @@
+/* 🛡️ MMK STRATEGIC INTELLIGENCE COMMAND ADMIN THEME */
+
+:root {
+  --theme-bg: #070a14;
+  --theme-elevation-50: #0b1120;
+  --theme-elevation-100: #0f1526;
+  --theme-elevation-150: #161f30;
+  --theme-elevation-200: #1e293b;
+  --theme-elevation-250: #26334d;
+  --theme-border-color: #1e293b;
+  --theme-text: #f1f5f9;
+}
+
+/* Sidebar Styling */
+.app-header,
+.nav {
+  background-color: #0b1120 !important;
+  border-right: 1px solid #1e293b !important;
+}
+
+/* Nav Item Hover & Active */
+.nav__link:hover,
+.nav__link--active {
+  background-color: rgba(75, 83, 32, 0.25) !important;
+  color: #d4af37 !important;
+  border-left: 3px solid #d4af37 !important;
+}
+
+/* Primary Action Buttons */
+.btn--style-primary {
+  background-color: #4b5320 !important;
+  border-color: #656e36 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(75, 83, 32, 0.4) !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    background-color: #5c6628 !important;
+    border-color: #d4af37 !important;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3) !important;
+  }
+}
+
+/* Table Row Hover */
+.table tbody tr:hover {
+  background-color: rgba(22, 31, 48, 0.6) !important;
+}
+
+/* Badge Enhancements */
+.pill {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+}

@@ -15,7 +15,7 @@ export default function NewsCarousel({ items }: CarouselProps) {
     if (items.length <= 1) return
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length)
-    }, 5000) // Rotates every 5 seconds
+    }, 5500)
 
     return () => clearInterval(interval)
   }, [items])
@@ -23,52 +23,133 @@ export default function NewsCarousel({ items }: CarouselProps) {
   if (!items || items.length === 0) return null
 
   return (
-    <div className="relative w-full overflow-hidden flex items-center justify-between min-h-[40px]">
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '8px 14px',
+        margin: '12px 0 6px 0',
+        borderRadius: '6px',
+        backgroundColor: 'var(--card-bg, #0F1526)',
+        border: '1px solid var(--border-color, #1E293B)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+        minHeight: '44px',
+      }}
+    >
       {/* Left Anchor Label Badge */}
-      <div className="flex items-center space-x-3 w-full">
-        <span className="flex-shrink-0 bg-red-600 text-white font-black text-[10px] md:text-xs px-2.5 py-1 tracking-widest uppercase rounded animate-pulse">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            backgroundColor: '#DC2626',
+            color: '#FFFFFF',
+            fontSize: '10.5px',
+            fontWeight: 800,
+            padding: '3px 9px',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            borderRadius: '3px',
+            flexShrink: 0,
+            boxShadow: '0 0 10px rgba(220, 38, 38, 0.45)',
+          }}
+        >
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: '#FFFFFF',
+              display: 'inline-block',
+              animation: 'pulse 1.5s infinite',
+            }}
+          />
           BREAKING
         </span>
 
         {/* Sliding Transition Shell */}
-        <div className="relative flex-1 h-6 overflow-hidden">
-          {items.map((article, index) => (
-            <div
-              key={article.id}
-              className={`absolute inset-0 w-full transform transition-all duration-700 ease-in-out flex items-center ${
-                index === currentIndex
-                  ? 'opacity-100 translate-y-0 pointer-events-auto'
-                  : 'opacity-0 translate-y-4 pointer-events-none'
-              }`}
-            >
-              <Link
-                href={`/articles/${article.slug}`}
-                className="text-xs md:text-sm font-medium text-gray-200 hover:text-[#656e36] transition-colors truncate block max-w-[85%]"
+        <div style={{ position: 'relative', flex: 1, height: '22px', overflow: 'hidden' }}>
+          {items.map((article, index) => {
+            const isCurrent = index === currentIndex
+            const pubDate = article.published_at || article.createdAt
+            const timeString = pubDate
+              ? new Date(pubDate).toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : 'LIVE'
+
+            return (
+              <div
+                key={article.id}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  opacity: isCurrent ? 1 : 0,
+                  transform: isCurrent ? 'translateY(0)' : 'translateY(8px)',
+                  transition: 'opacity 0.5s ease, transform 0.5s ease',
+                  pointerEvents: isCurrent ? 'auto' : 'none',
+                }}
               >
-                <span className="text-[#a3a3a3] font-mono mr-2">
-                  [
-                  {new Date(article.published_at).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                  ]
-                </span>
-                {article.title}
-              </Link>
-            </div>
-          ))}
+                <Link
+                  href={`/articles/${article.slug}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: 'var(--text-color, #E2E8F0)',
+                    textDecoration: 'none',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    maxWidth: '92%',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                  className="hover:text-amber-400 transition-colors"
+                >
+                  <span
+                    style={{
+                      fontFamily: 'monospace',
+                      fontSize: '11px',
+                      color: 'var(--muted-text, #94A3B8)',
+                      backgroundColor: 'rgba(255,255,255,0.06)',
+                      padding: '1px 5px',
+                      borderRadius: '3px',
+                    }}
+                  >
+                    [{timeString}]
+                  </span>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {article.title}
+                  </span>
+                </Link>
+              </div>
+            )
+          })}
         </div>
       </div>
 
       {/* Manual Slide Toggles */}
-      <div className="flex items-center space-x-1 pl-4 flex-shrink-0">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', paddingLeft: '12px', flexShrink: 0 }}>
         {items.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentIndex(idx)}
-            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-              idx === currentIndex ? 'bg-[#656e36] w-3' : 'bg-gray-600'
-            }`}
+            style={{
+              width: idx === currentIndex ? '16px' : '6px',
+              height: '6px',
+              borderRadius: '3px',
+              border: 0,
+              padding: 0,
+              backgroundColor: idx === currentIndex ? '#656E36' : 'var(--border-color, #334155)',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+            }}
             aria-label={`Go to slide ${idx + 1}`}
           />
         ))}

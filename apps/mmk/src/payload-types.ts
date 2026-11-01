@@ -78,6 +78,7 @@ export interface Config {
     'gallery-photos': GalleryPhoto;
     'contact-submissions': ContactSubmission;
     ads: Ad;
+    merchandise: Merchandise;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -96,6 +97,7 @@ export interface Config {
     'gallery-photos': GalleryPhotosSelect<false> | GalleryPhotosSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
     ads: AdsSelect<false> | AdsSelect<true>;
+    merchandise: MerchandiseSelect<false> | MerchandiseSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -175,7 +177,7 @@ export interface User {
 export interface Media {
   id: number;
   /**
-   * Crucial for platform SEO performance and screen-reader compliance. Describe what is happening in the picture.
+   * Crucial for platform SEO performance and screen-reader compliance.
    */
   alt: string;
   updatedAt: string;
@@ -242,6 +244,14 @@ export interface Article {
   published_at: string;
   is_featured?: boolean | null;
   is_breaking?: boolean | null;
+  /**
+   * Promotes this article to the Special Articles section on the homepage sidebar.
+   */
+  is_special?: boolean | null;
+  /**
+   * Auto-calculated based on lexical word count.
+   */
+  reading_time_minutes?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -384,7 +394,11 @@ export interface Event {
   location_name: string;
   location_city: string;
   /**
-   * Toggling this off instantly updates the public tag banner to CLOSED.
+   * Provide the destination web link where users fill out forms or clear booking passes.
+   */
+  registration_url?: string | null;
+  /**
+   * Toggling this off instantly updates the public tag banner to CLOSED and hides the portal routing line.
    */
   registration_open?: boolean | null;
   /**
@@ -492,6 +506,28 @@ export interface Ad {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "merchandise".
+ */
+export interface Merchandise {
+  id: number;
+  title: string;
+  description?: string | null;
+  price: number;
+  /**
+   * External storefront or affiliate purchase link (Amazon, Shopify, etc.)
+   */
+  external_buy_url?: string | null;
+  images?: (number | Media)[] | null;
+  sizes?: ('free_size' | 'S' | 'M' | 'L' | 'XL' | 'XXL')[] | null;
+  slug?: string | null;
+  status: 'draft' | 'published' | 'archived';
+  in_stock?: boolean | null;
+  is_featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -557,6 +593,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'ads';
         value: number | Ad;
+      } | null)
+    | ({
+        relationTo: 'merchandise';
+        value: number | Merchandise;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -669,6 +709,8 @@ export interface ArticlesSelect<T extends boolean = true> {
   published_at?: T;
   is_featured?: T;
   is_breaking?: T;
+  is_special?: T;
+  reading_time_minutes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -731,6 +773,7 @@ export interface EventsSelect<T extends boolean = true> {
   cover_image?: T;
   location_name?: T;
   location_city?: T;
+  registration_url?: T;
   registration_open?: T;
   event_date?: T;
   slug?: T;
@@ -801,6 +844,24 @@ export interface AdsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "merchandise_select".
+ */
+export interface MerchandiseSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  price?: T;
+  external_buy_url?: T;
+  images?: T;
+  sizes?: T;
+  slug?: T;
+  status?: T;
+  in_stock?: T;
+  is_featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -856,6 +917,65 @@ export interface SiteSetting {
     instagram?: string | null;
     facebook?: string | null;
   };
+  book_promo: {
+    enabled?: boolean | null;
+    title?: string | null;
+    description?: string | null;
+    cover_image?: (number | null) | Media;
+    custom_cover_url?: string | null;
+    /**
+     * Destination affiliate purchase link opened in a new tab when clicking Buy the Book.
+     */
+    affiliate_url: string;
+    cta_text?: string | null;
+    disclosure?: string | null;
+  };
+  doc_promo: {
+    enabled?: boolean | null;
+    title?: string | null;
+    subtitle?: string | null;
+    description?: string | null;
+    thumbnail_image?: (number | null) | Media;
+    custom_thumbnail_url?: string | null;
+    /**
+     * Alphanumeric YouTube video ID for playing the 1.3 min teaser trailer inline or in modal.
+     */
+    trailer_youtube_id?: string | null;
+    /**
+     * Destination URL where users will be redirected when clicking Watch Documentary.
+     */
+    youtube_url: string;
+    cta_text?: string | null;
+    episode_info?: string | null;
+  };
+  breaking_banner?: {
+    enabled?: boolean | null;
+    label?: string | null;
+    message?: string | null;
+    link_url?: string | null;
+    badge_style?: ('red' | 'gold' | 'olive') | null;
+  };
+  audience_metrics?: {
+    youtube_subscribers?: string | null;
+    instagram_followers?: string | null;
+    facebook_followers?: string | null;
+    twitter_followers?: string | null;
+    total_reach?: string | null;
+  };
+  media_kit?: {
+    download_url?: string | null;
+    speaker_intro?: string | null;
+    inquiries_email?: string | null;
+  };
+  youtube_automation?: {
+    channel_id?: string | null;
+    auto_sync_enabled?: boolean | null;
+  };
+  footer_customization?: {
+    about_summary?: string | null;
+    copyright_text?: string | null;
+    disclaimer_text?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -876,6 +996,70 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         twitter_x?: T;
         instagram?: T;
         facebook?: T;
+      };
+  book_promo?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        description?: T;
+        cover_image?: T;
+        custom_cover_url?: T;
+        affiliate_url?: T;
+        cta_text?: T;
+        disclosure?: T;
+      };
+  doc_promo?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        subtitle?: T;
+        description?: T;
+        thumbnail_image?: T;
+        custom_thumbnail_url?: T;
+        trailer_youtube_id?: T;
+        youtube_url?: T;
+        cta_text?: T;
+        episode_info?: T;
+      };
+  breaking_banner?:
+    | T
+    | {
+        enabled?: T;
+        label?: T;
+        message?: T;
+        link_url?: T;
+        badge_style?: T;
+      };
+  audience_metrics?:
+    | T
+    | {
+        youtube_subscribers?: T;
+        instagram_followers?: T;
+        facebook_followers?: T;
+        twitter_followers?: T;
+        total_reach?: T;
+      };
+  media_kit?:
+    | T
+    | {
+        download_url?: T;
+        speaker_intro?: T;
+        inquiries_email?: T;
+      };
+  youtube_automation?:
+    | T
+    | {
+        channel_id?: T;
+        auto_sync_enabled?: T;
+      };
+  footer_customization?:
+    | T
+    | {
+        about_summary?: T;
+        copyright_text?: T;
+        disclaimer_text?: T;
       };
   updatedAt?: T;
   createdAt?: T;

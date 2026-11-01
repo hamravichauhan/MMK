@@ -17,6 +17,17 @@ export const ContactSubmissions: CollectionConfig = {
     group: 'Operational Management',
     listSearchableFields: ['full_name', 'email', 'subject', 'message'],
   },
+  hooks: {
+    afterChange: [
+      ({ doc, operation }) => {
+        if (operation === 'create') {
+          console.log(
+            `[STRATEGIC INQUIRY ALERT] New lead received from ${doc.full_name} (${doc.email}) [${doc.inquiry_type}]: ${doc.subject}`
+          )
+        }
+      },
+    ],
+  },
   fields: [
     {
       type: 'tabs',

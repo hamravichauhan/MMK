@@ -10,9 +10,15 @@ export const Soldiers: CollectionConfig = {
   },
   admin: { 
     useAsTitle: 'full_name',
-    defaultColumns: ['is_martyr', 'full_name', 'rank', 'branch', 'regiment_unit', 'updatedAt'],
+    defaultColumns: ['full_name', 'rank', 'branch', 'regiment_unit', 'updatedAt'],
     group: 'Honour Registry',
     listSearchableFields: ['full_name', 'rank', 'regiment_unit', 'home_state'],
+    livePreview: {
+      url: ({ data }) => {
+        const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+        return `${baseUrl}/know-your-soldiers/${data?.slug || ''}`
+      },
+    },
   },
   fields: [
     {
@@ -32,7 +38,10 @@ export const Soldiers: CollectionConfig = {
                   label: 'Soldier Full Name',
                   admin: { 
                     width: '50%',
-                    placeholder: 'e.g., Captain Vikram Batra'
+                    placeholder: 'e.g., Captain Vikram Batra',
+                    components: {
+                      Cell: '/components/admin/SoldierCell#SoldierCell',
+                    },
                   }
                 },
                 {

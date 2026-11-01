@@ -3,19 +3,21 @@ import { CollectionConfig } from 'payload'
 export const Media: CollectionConfig = {
   slug: 'media',
   admin: {
-    // Shows the descriptive alt tag text as the asset identification label
     useAsTitle: 'alt',
-    // Displays critical image dimensions and visual thumbnails on grid rows instantly
     defaultColumns: ['filename', 'thumbnail', 'alt', 'mimeType', 'filesize', 'updatedAt'],
     group: 'Operational Management',
     listSearchableFields: ['filename', 'alt'],
   },
   access: {
-    read: () => true, // Ensure strategic assets load seamlessly on the public frontend
+    read: () => true,
   },
   upload: {
+    formatOptions: {
+      format: 'webp',
+      options: { quality: 85 },
+    },
     adminThumbnail: 'thumbnail',
-    disableLocalStorage: true, // Safeguards server disk boundaries by forcing Cloudinary storage routing
+    disableLocalStorage: true,
   },
   fields: [
     {
@@ -28,8 +30,8 @@ export const Media: CollectionConfig = {
           label: 'Accessibility Alternative Text (Alt Text)',
           admin: {
             width: '100%',
-            placeholder: 'e.g., Major Madhan Kumar analyzing tactical defense map boundaries at the New Delhi briefing',
-            description: 'Crucial for platform SEO performance and screen-reader compliance. Describe what is happening in the picture.',
+            placeholder: 'e.g., Major Madhan Kumar analyzing tactical defense map boundaries',
+            description: 'Crucial for platform SEO performance and screen-reader compliance.',
           },
         },
       ],

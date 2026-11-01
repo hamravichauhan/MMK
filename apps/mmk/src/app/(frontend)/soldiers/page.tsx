@@ -1,40 +1,56 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Soldier } from '@/payload-types'
-import { Search, RotateCcw, ShieldAlert, Filter, Medal } from 'lucide-react'
+import { Search, RotateCcw, Shield, Medal, Award, MapPin, Heart } from 'lucide-react'
+import HomeThemeWrapper from '@/components/layout/HomeThemeWrapper'
+import { getCloudinaryUrl } from '@/utils/mediaUrl'
 
 export default function SoldiersListPage() {
-  // DB Dataset States
   const [allSoldiers, setAllSoldiers] = useState<Soldier[]>([])
   const [filteredSoldiers, setFilteredSoldiers] = useState<Soldier[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Active Multi-Filter Configuration States
+  // Multi-Filter States
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedBranch, setSelectedBranch] = useState('all')
   const [selectedRank, setSelectedRank] = useState('all')
+  const [selectedStatus, setSelectedStatus] = useState('all')
+
+  const branches = [
+    { label: 'All Branches', value: 'all' },
+    { label: '🇮🇳 Indian Army', value: 'army' },
+    { label: '⚓ Indian Navy', value: 'navy' },
+    { label: '✈️ Air Force', value: 'airforce' },
+    { label: '🛡️ Para SF', value: 'parasf' },
+  ]
 
   const ranks = [
     { label: 'All Ranks', value: 'all' },
     { label: 'Major', value: 'major' },
     { label: 'Captain', value: 'captain' },
+    { label: 'Subedar Major', value: 'subedar major' },
     { label: 'Naik', value: 'naik' },
+    { label: 'Brigadier', value: 'brigadier' },
+    { label: 'Flying Officer', value: 'flying officer' },
   ]
 
-  // 📡 FETCH ENGINE: Safely extracts data arrays from Payload REST context
+  const statusOptions = [
+    { label: 'All Heroes', value: 'all' },
+    { label: '🇮🇳 Veer Gatha (Martyrs)', value: 'martyr' },
+    { label: '🎖️ Living Veterans', value: 'veteran' },
+  ]
+
   useEffect(() => {
     async function fetchSoldiers() {
       try {
         const res = await fetch('/api/soldiers?limit=100&depth=1')
         const data = await res.json()
-
         if (data && data.docs && Array.isArray(data.docs)) {
           setAllSoldiers(data.docs)
           setFilteredSoldiers(data.docs)
-        } else if (Array.isArray(data)) {
-          setAllSoldiers(data)
-          setFilteredSoldiers(data)
         }
       } catch (err) {
         console.error('Failed to parse database records:', err)
@@ -45,45 +61,60 @@ export default function SoldiersListPage() {
     fetchSoldiers()
   }, [])
 
-  // 🧠 ADVANCED MULTI-FILTER MATRIX ENGINE
   useEffect(() => {
     let result = [...allSoldiers]
 
-    // 1. Text Search Filter (Handles Name, Regiment, and Decorations safely)
+    // 1. Search Query Match
     if (searchQuery.trim() !== '') {
-      const query = searchQuery.toLowerCase().trim()
+      const q = searchQuery.toLowerCase().trim()
       result = result.filter(
-        (soldier) =>
-          soldier?.name?.toLowerCase().includes(query) ||
-          soldier?.regiment?.toLowerCase().includes(query) ||
-          soldier?.decorations?.toLowerCase().includes(query),
+        (s) =>
+          s.full_name?.toLowerCase().includes(q) ||
+          s.regiment_unit?.toLowerCase().includes(q) ||
+          s.awards?.toLowerCase().includes(q) ||
+          s.home_state?.toLowerCase().includes(q) ||
+          s.rank?.toLowerCase().includes(q),
       )
     }
 
-    // 2. Rank Pill Filter Match
+    // 2. Branch Match
+    if (selectedBranch !== 'all') {
+      result = result.filter((s) => s.branch?.toLowerCase() === selectedBranch)
+    }
+
+    // 3. Rank Match
     if (selectedRank !== 'all') {
-      result = result.filter((soldier) => soldier?.rank?.toLowerCase() === selectedRank)
+      result = result.filter((s) => s.rank?.toLowerCase().includes(selectedRank))
+    }
+
+    // 4. Status Match
+    if (selectedStatus === 'martyr') {
+      result = result.filter((s) => s.is_martyr === true)
+    } else if (selectedStatus === 'veteran') {
+      result = result.filter((s) => s.is_martyr !== true)
     }
 
     setFilteredSoldiers(result)
-  }, [searchQuery, selectedRank, allSoldiers])
+  }, [searchQuery, selectedBranch, selectedRank, selectedStatus, allSoldiers])
 
   const resetFilters = () => {
     setSearchQuery('')
+    setSelectedBranch('all')
     setSelectedRank('all')
+    setSelectedStatus('all')
   }
 
   if (loading) {
     return (
       <div
         style={{
-          minHeight: '75vh',
+          minHeight: '80vh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'var(--font-sans)',
-          color: 'var(--muted-foreground)',
-          backgroundColor: 'var(--background)',
+          fontFamily: '"Inter", sans-serif',
+          color: 'var(--muted-text, #94a3b8)',
+          backgroundColor: 'var(--bg-color, #070A14)',
         }}
       >
         Loading Armed Forces registry...
@@ -92,393 +123,453 @@ export default function SoldiersListPage() {
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--background)',
-        fontFamily: 'var(--font-sans)',
-        color: 'var(--foreground)',
-        margin: 0,
-        padding: 0,
-      }}
-    >
-      {/* 1. BRAND HERO SECTION */}
-      <section style={{ backgroundColor: '#0B1D3A', color: '#ffffff', padding: '64px 24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              color: '#cbd5e1',
-              fontSize: '11px',
-              fontWeight: '700',
-              textTransform: 'uppercase',
-              padding: '4px 10px',
-              borderRadius: '4px',
-              marginBottom: '16px',
-              letterSpacing: '0.5px',
-            }}
-          >
-            Roll of Honour
-          </div>
-          <h1
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: '44px',
-              fontWeight: '700',
-              margin: '0 0 16px 0',
-              letterSpacing: '-0.5px',
-              color: '#ffffff',
-            }}
-          >
-            Armed Forces Profiles & Tributes
-          </h1>
-          <p
-            style={{
-              color: '#cbd5e1',
-              fontSize: '18px',
-              margin: 0,
-              maxWidth: '768px',
-              lineHeight: '1.6',
-              fontWeight: '300',
-            }}
-          >
-            Preserving the immortal stories of valour, operational milestones, and strategic
-            histories of our nation&apos;s greatest defenders.
-          </p>
-        </div>
-      </section>
-
-      {/* Main Framework Content Bounds */}
-      <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px' }}>
-        {/* 2. ADVANCED INTERACTIVE FILTER PANEL */}
-        <div
+    <HomeThemeWrapper breakingNewsTrack={null} trendingNavTrack={null}>
+      <main
+        style={{
+          minHeight: '100vh',
+          backgroundColor: 'var(--bg-color, #070A14)',
+          color: 'var(--text-color, #E2E8F0)',
+          fontFamily: '"Inter", system-ui, sans-serif',
+          margin: 0,
+          padding: 0,
+          paddingBottom: '80px',
+        }}
+      >
+        {/* 1. BRAND HERO SECTION */}
+        <section
           style={{
-            backgroundColor: 'var(--card)',
-            border: '1px solid var(--border)',
-            borderRadius: '12px',
-            padding: '24px',
-            marginBottom: '32px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+            padding: '56px 24px',
+            borderBottom: '1px solid var(--border-color, #1E293B)',
+            background: 'radial-gradient(circle at top right, var(--card-bg, #0F172A) 0%, var(--bg-color, #070A14) 100%)',
           }}
         >
+          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: 'rgba(217, 119, 6, 0.15)',
+                border: '1px solid #D97706',
+                color: '#F59E0B',
+                fontSize: '11px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                padding: '4px 10px',
+                borderRadius: '4px',
+                marginBottom: '16px',
+                letterSpacing: '0.05em',
+              }}
+            >
+              <Medal size={12} /> Roll of Honour • Know Your Soldiers
+            </div>
+            <h1
+              style={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontSize: 'clamp(28px, 4vw, 42px)',
+                fontWeight: 800,
+                color: 'var(--heading-color, #FFFFFF)',
+                margin: '0 0 12px 0',
+                letterSpacing: '-0.5px',
+              }}
+            >
+              Indian Armed Forces Memorial & Archives
+            </h1>
+            <p
+              style={{
+                color: 'var(--muted-text, #cbd5e1)',
+                fontSize: '16px',
+                maxWidth: '740px',
+                lineHeight: '1.6',
+                margin: 0,
+              }}
+            >
+              Dedicated tribute portal documenting the service, citations, unit histories, and supreme valor of India&apos;s living veterans and fallen martyrs.
+            </p>
+          </div>
+        </section>
+
+        {/* 2. ADVANCED MULTI-FILTER SUITE */}
+        <section style={{ maxWidth: '1280px', margin: '36px auto 0 auto', padding: '0 24px' }}>
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '20px',
-              alignItems: 'end',
+              backgroundColor: 'var(--card-bg, #0F1526)',
+              border: '1px solid var(--border-color, #1E293B)',
+              borderRadius: '8px',
+              padding: '24px',
+              marginBottom: '32px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
-            {/* Live Text Field Input */}
-            <div>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  color: 'var(--muted-foreground)',
-                  marginBottom: '8px',
-                }}
-              >
-                <Search size={14} /> Search Records
-              </label>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <Search
-                  size={16}
-                  style={{ position: 'absolute', left: '14px', color: 'var(--muted-foreground)' }}
-                />
-                <input
-                  type="text"
-                  placeholder="Search by officer name, decoration, or regiment unit..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+            {/* Search + Reset Row */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                gap: '16px',
+                alignItems: 'end',
+                marginBottom: '20px',
+              }}
+            >
+              <div style={{ flex: 2 }}>
+                <label
                   style={{
-                    width: '100%',
-                    boxSizing: 'border-box',
-                    padding: '10px 14px 10px 42px',
-                    borderRadius: '6px',
-                    border: '1px solid var(--border)',
-                    backgroundColor: 'var(--input-background)',
-                    fontSize: '14px',
-                    fontFamily: 'inherit',
-                    outline: 'none',
-                    color: 'var(--foreground)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    color: 'var(--muted-text, #94A3B8)',
+                    marginBottom: '8px',
+                    letterSpacing: '0.05em',
                   }}
-                />
+                >
+                  <Search size={13} /> Search Officer, Unit, Decoration, or State
+                </label>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <Search
+                    size={16}
+                    style={{ position: 'absolute', left: '12px', color: 'var(--muted-text, #94A3B8)' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="e.g., Vikram Batra, 13 JAK RIF, Param Vir Chakra, Himachal Pradesh..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      padding: '10px 14px 10px 38px',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border-color, #1E293B)',
+                      backgroundColor: 'var(--input-bg, #0A0E1A)',
+                      color: 'var(--text-color, #FFFFFF)',
+                      fontSize: '14px',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <button
+                  onClick={resetFilters}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '11px 16px',
+                    backgroundColor: 'var(--subtle-bg, rgba(255,255,255,0.05))',
+                    color: 'var(--text-color, #E2E8F0)',
+                    border: '1px solid var(--border-color, #1E293B)',
+                    borderRadius: '4px',
+                    fontSize: '13.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <RotateCcw size={14} /> Clear All Filters
+                </button>
               </div>
             </div>
 
-            {/* Clear Button Trigger */}
-            <div>
-              <button
-                onClick={resetFilters}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  width: '100%',
-                  padding: '11px 14px',
-                  backgroundColor: '#f1f5f9',
-                  color: '#475569',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s',
-                }}
-              >
-                <RotateCcw size={14} /> Clear Filters
-              </button>
+            {/* Filter Pills Grid */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderTop: '1px solid var(--border-color, #1E293B)', paddingTop: '16px' }}>
+              {/* Category: Status / Veer Gatha */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted-text, #94A3B8)', minWidth: '100px', letterSpacing: '0.04em' }}>
+                  Category:
+                </span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {statusOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setSelectedStatus(opt.value)}
+                      style={{
+                        padding: '6px 14px',
+                        fontSize: '12.5px',
+                        fontWeight: 600,
+                        borderRadius: '4px',
+                        border: '1px solid',
+                        borderColor: selectedStatus === opt.value ? '#DC2626' : 'var(--border-color, #1E293B)',
+                        backgroundColor: selectedStatus === opt.value ? 'rgba(220, 38, 38, 0.2)' : 'var(--card-bg, #0F1526)',
+                        color: selectedStatus === opt.value ? '#EF4444' : 'var(--text-color, #94A3B8)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Branch */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted-text, #94A3B8)', minWidth: '100px', letterSpacing: '0.04em' }}>
+                  Branch:
+                </span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {branches.map((b) => (
+                    <button
+                      key={b.value}
+                      onClick={() => setSelectedBranch(b.value)}
+                      style={{
+                        padding: '6px 14px',
+                        fontSize: '12.5px',
+                        fontWeight: 600,
+                        borderRadius: '4px',
+                        border: '1px solid',
+                        borderColor: selectedBranch === b.value ? '#656E36' : 'var(--border-color, #1E293B)',
+                        backgroundColor: selectedBranch === b.value ? '#656E36' : 'var(--card-bg, #0F1526)',
+                        color: selectedBranch === b.value ? '#ffffff' : 'var(--text-color, #94A3B8)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {b.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Military Rank */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted-text, #94A3B8)', minWidth: '100px', letterSpacing: '0.04em' }}>
+                  Rank:
+                </span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {ranks.map((r) => (
+                    <button
+                      key={r.value}
+                      onClick={() => setSelectedRank(r.value)}
+                      style={{
+                        padding: '5px 12px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        borderRadius: '4px',
+                        border: '1px solid',
+                        borderColor: selectedRank === r.value ? '#D97706' : 'var(--border-color, #1E293B)',
+                        backgroundColor: selectedRank === r.value ? '#D97706' : 'var(--card-bg, #0F1526)',
+                        color: selectedRank === r.value ? '#ffffff' : 'var(--text-color, #94A3B8)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Horizontal Filtering Tags Row */}
-          <div
-            style={{ marginTop: '20px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}
-          >
-            <span
+          {/* 3. SOLDIERS CARDS GRID */}
+          {filteredSoldiers.length === 0 ? (
+            <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: 'var(--muted-foreground)',
-                marginBottom: '12px',
+                textAlign: 'center',
+                padding: '80px 0',
+                border: '1px dashed var(--border-color, #1E293B)',
+                borderRadius: '8px',
+                color: 'var(--muted-text, #94A3B8)',
+                backgroundColor: 'var(--card-bg, #0F1526)',
               }}
             >
-              <Filter size={14} /> Filter by Rank Designation
-            </span>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {ranks.map((rk) => (
-                <button
-                  key={rk.value}
-                  onClick={() => setSelectedRank(rk.value)}
-                  style={{
-                    padding: '6px 16px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    borderRadius: '9999px',
-                    border: '1px solid',
-                    borderColor: selectedRank === rk.value ? 'var(--accent)' : 'var(--border)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    backgroundColor: selectedRank === rk.value ? 'var(--accent)' : 'var(--card)',
-                    color:
-                      selectedRank === rk.value
-                        ? 'var(--accent-foreground)'
-                        : 'var(--muted-foreground)',
-                  }}
-                >
-                  {rk.label}
-                </button>
-              ))}
+              No soldier or veteran records match your combined filtering parameters.
             </div>
-          </div>
-        </div>
+          ) : (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+                gap: '24px',
+              }}
+            >
+              {filteredSoldiers.map((soldier) => {
+                const isMartyr = soldier.is_martyr === true
+                const photoUrl = getCloudinaryUrl(soldier.photo || (soldier as any).profile_image)
 
-        {/* Counter Results Label Text */}
-        <div
-          style={{
-            fontSize: '14px',
-            color: 'var(--muted-foreground)',
-            marginBottom: '24px',
-            fontWeight: '500',
-          }}
-        >
-          Showing <strong>{filteredSoldiers.length}</strong> of {allSoldiers.length} profile entries
-        </div>
-
-        {/* 3. RESPONSIVE HORIZONTAL CARD LAYOUT GRID */}
-        {filteredSoldiers.length === 0 ? (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '80px 0',
-              border: '1px dashed var(--border)',
-              borderRadius: '16px',
-              color: 'var(--muted-foreground)',
-              backgroundColor: 'var(--card)',
-            }}
-          >
-            No profile entries match your search filters inside the system.
-          </div>
-        ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-              gap: '32px',
-            }}
-          >
-            {filteredSoldiers.map((soldier) => {
-              const profileImage =
-                soldier.profile_image && typeof soldier.profile_image === 'object'
-                  ? (soldier.profile_image as any)
-                  : null
-
-              return (
-                <Link
-                  key={soldier.id}
-                  href={`/soldiers/${soldier.slug}`}
-                  style={{
-                    textDecoration: 'none',
-                    color: 'inherit',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <article
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      backgroundColor: 'var(--card)',
-                      border: '1px solid var(--border)',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
-                      height: '180px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                    }}
+                return (
+                  <Link
+                    key={soldier.id}
+                    href={`/soldiers/${soldier.slug || soldier.id}`}
+                    style={{ textDecoration: 'none', color: 'inherit', display: 'flex' }}
                   >
-                    {/* Left Frame: Officer Portrait Image Container */}
                     <div
+                      className="soldier-card-item"
                       style={{
-                        width: '130px',
-                        height: '100%',
-                        backgroundColor: 'var(--input-background)',
-                        flexShrink: 0,
-                        borderRight: '1px solid var(--border)',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {profileImage?.url ? (
-                        <img
-                          src={profileImage.url}
-                          alt={soldier.name || 'Armed Forces Officer'}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'var(--muted-foreground)',
-                          }}
-                        >
-                          <ShieldAlert size={22} />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right Frame: Text Parameters Info Scope */}
-                    <div
-                      style={{
-                        padding: '20px',
-                        flexGrow: 1,
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: 'center',
+                        width: '100%',
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                        border: '1px solid var(--border-color, #1E293B)',
+                        borderLeft: isMartyr ? '4px solid #DC2626' : '4px solid #656E36',
+                        backgroundColor: 'var(--card-bg, #0F1526)',
+                        transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
                       }}
                     >
+                      {/* Top Header Tag Strip */}
                       <div
                         style={{
                           display: 'flex',
-                          gap: '6px',
                           alignItems: 'center',
-                          marginBottom: '6px',
+                          justifyContent: 'space-between',
+                          padding: '10px 16px',
+                          borderBottom: '1px solid var(--border-color, #1E293B)',
+                          backgroundColor: isMartyr ? 'rgba(220, 38, 38, 0.08)' : 'transparent',
                         }}
                       >
                         <span
                           style={{
-                            fontSize: '10px',
-                            fontWeight: '700',
+                            fontSize: '10.5px',
+                            fontWeight: 800,
                             textTransform: 'uppercase',
-                            color: 'var(--accent-foreground)',
-                            backgroundColor: 'var(--accent)',
-                            padding: '2px 6px',
-                            borderRadius: '3px',
-                            letterSpacing: '0.5px',
+                            letterSpacing: '0.06em',
+                            color: isMartyr ? '#EF4444' : '#656E36',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
                           }}
                         >
-                          {soldier.rank || 'Officer'}
+                          {isMartyr ? (
+                            <>
+                              <Heart size={12} fill="#EF4444" />
+                              Veer Gatha • Supreme Sacrifice
+                            </>
+                          ) : (
+                            <>
+                              <Shield size={12} />
+                              Living Veteran • Armed Forces
+                            </>
+                          )}
+                        </span>
+
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            color: 'var(--muted-text, #94A3B8)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                          }}
+                        >
+                          <MapPin size={11} />
+                          {soldier.home_state || 'India'}
                         </span>
                       </div>
 
-                      <h2
-                        style={{
-                          fontSize: '20px',
-                          fontFamily: 'var(--font-serif)',
-                          fontWeight: 'bold',
-                          color: 'var(--foreground)',
-                          margin: '0 0 6px 0',
-                          lineHeight: '1.2',
-                        }}
-                      >
-                        {soldier.name || 'Unnamed Profile Record'}
-                      </h2>
-
-                      {soldier.regiment && (
-                        <p
-                          style={{
-                            color: 'var(--muted-foreground)',
-                            fontSize: '13px',
-                            margin: '0 0 10px 0',
-                            fontWeight: '500',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 1,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          {soldier.regiment}
-                        </p>
-                      )}
-
-                      {soldier.decorations && (
+                      {/* Content Body with Portrait Thumbnail */}
+                      <div style={{ display: 'flex', gap: '16px', padding: '16px', alignItems: 'flex-start', flex: 1 }}>
+                        {/* Portrait */}
                         <div
                           style={{
-                            marginTop: 'auto',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            fontSize: '12px',
-                            color: 'var(--destructive)',
-                            fontWeight: '600',
+                            position: 'relative',
+                            width: '84px',
+                            height: '108px',
+                            borderRadius: '4px',
+                            overflow: 'hidden',
+                            backgroundColor: '#090D1A',
+                            flexShrink: 0,
+                            border: '1px solid var(--border-color, #1E293B)',
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
                           }}
                         >
+                          <Image
+                            src={photoUrl}
+                            alt={soldier.full_name || 'Soldier Photo'}
+                            fill
+                            unoptimized
+                            sizes="84px"
+                            style={{ objectFit: 'cover' }}
+                          />
+                        </div>
+
+                        {/* Details */}
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                           <span
                             style={{
-                              display: '-webkit-box',
-                              WebkitLineClamp: 1,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              color: '#D97706',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.04em',
                             }}
                           >
-                            🏅 {soldier.decorations}
+                            {soldier.rank}
                           </span>
+
+                          <h3
+                            style={{
+                              fontSize: '17px',
+                              fontWeight: 800,
+                              color: 'var(--heading-color, #FFFFFF)',
+                              margin: '2px 0 6px 0',
+                              lineHeight: '1.3',
+                            }}
+                          >
+                            {soldier.full_name}
+                          </h3>
+
+                          <div style={{ fontSize: '12px', color: 'var(--muted-text, #94A3B8)', marginBottom: '8px' }}>
+                            {soldier.regiment_unit}
+                          </div>
+
+                          {soldier.awards && (
+                            <div
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                color: '#FCD34D',
+                                backgroundColor: 'rgba(217, 119, 6, 0.12)',
+                                padding: '3px 8px',
+                                borderRadius: '3px',
+                                width: 'fit-content',
+                                marginTop: 'auto',
+                              }}
+                            >
+                              <Award size={12} />
+                              <span>{soldier.awards}</span>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
+
+                      {/* Footer Quote or Action Strip */}
+                      <div
+                        style={{
+                          borderTop: '1px solid var(--border-color, #1E293B)',
+                          padding: '10px 16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          fontSize: '11px',
+                          backgroundColor: 'rgba(255,255,255,0.02)',
+                        }}
+                      >
+                        <span style={{ color: 'var(--muted-text, #94A3B8)', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '75%' }}>
+                          {soldier.short_bio ? `"${soldier.short_bio}"` : `Honour & Gallantry Citation`}
+                        </span>
+                        <span style={{ fontWeight: 700, color: '#656E36', whiteSpace: 'nowrap' }}>
+                          View Citation →
+                        </span>
+                      </div>
                     </div>
-                  </article>
-                </Link>
-              )
-            })}
-          </div>
-        )}
-      </section>
-    </main>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </section>
+      </main>
+    </HomeThemeWrapper>
   )
 }

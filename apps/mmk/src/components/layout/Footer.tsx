@@ -1,5 +1,8 @@
+'use client'
+
+import React from 'react'
 import Link from 'next/link'
-import { X, LinkIcon, Mail } from 'lucide-react'
+import { X, Globe, Mail, Shield, ExternalLink } from 'lucide-react'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -7,11 +10,13 @@ export default function Footer() {
   return (
     <footer
       style={{
-        backgroundColor: '#171717',
-        color: '#a3a3a3',
+        backgroundColor: 'var(--footer-bg, #0B1120)',
+        borderTop: '1px solid var(--border-color, #1E293B)',
+        color: 'var(--muted-text, #94A3B8)',
         padding: '64px 24px 32px 24px',
         fontFamily: '"Inter", system-ui, sans-serif',
-        fontSize: '15px',
+        fontSize: '14.5px',
+        transition: 'background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease',
       }}
     >
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
@@ -19,9 +24,9 @@ export default function Footer() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '48px',
-            marginBottom: '64px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '40px',
+            marginBottom: '48px',
           }}
         >
           {/* Column 1: Info and Social Handles */}
@@ -31,33 +36,31 @@ export default function Footer() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                marginBottom: '20px',
-                color: '#ffffff',
+                marginBottom: '16px',
               }}
             >
-              <div style={{ color: '#ffffff', display: 'flex', alignItems: 'center' }}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#656e36"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
+              <div
+                style={{
+                  backgroundColor: '#4B5320',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ffffff',
+                  flexShrink: 0,
+                }}
+              >
+                <Shield size={20} />
               </div>
               <h3
                 style={{
                   fontFamily: '"Playfair Display", Georgia, serif',
-                  fontSize: '22px',
+                  fontSize: '20px',
                   fontWeight: 'bold',
                   margin: 0,
+                  color: 'var(--heading-color, #FFFFFF)',
                 }}
               >
                 Major Madhan Kumar
@@ -65,19 +68,18 @@ export default function Footer() {
             </div>
             <p
               style={{
-                color: '#a3a3a3',
-                margin: '0 0 24px 0',
+                color: 'var(--muted-text, #94A3B8)',
+                margin: '0 0 20px 0',
                 maxWidth: '380px',
                 lineHeight: '1.6',
-                fontSize: '14px',
+                fontSize: '13.5px',
               }}
             >
-              Independent defense analyst providing authoritative commentary on geopolitical
-              affairs, military strategy, and regional security dynamics.
+              Indian Armed Forces veteran & strategic defense analyst delivering high-density intelligence, geopolitical assessments, and national security insights to over 850,000+ defense followers worldwide.
             </p>
 
             {/* Circular Social Buttons Wrapper */}
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               {[
                 {
                   icon: (
@@ -96,27 +98,33 @@ export default function Footer() {
                       <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
                     </svg>
                   ),
-                  href: '#',
+                  href: 'https://www.youtube.com/@MajorMadhanKumar',
+                  label: 'YouTube',
                 },
-                { icon: <X size={16} />, href: '#' },
-                { icon: <LinkIcon size={16} />, href: '#' },
-                { icon: <Mail size={16} />, href: '#' },
+                { icon: <X size={15} />, href: 'https://twitter.com/MajorMadhanKumar', label: 'Twitter/X' },
+                { icon: <Globe size={15} />, href: 'https://majormadhankumar.in', label: 'Website' },
+                { icon: <Mail size={15} />, href: 'mailto:contact@majormadhankumar.com', label: 'Email' },
               ].map((social, idx) => (
                 <a
                   key={idx}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
                   style={{
                     width: '36px',
                     height: '36px',
-                    borderRadius: '50%',
-                    backgroundColor: '#262626',
-                    color: '#d4d4d4',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--card-bg, #0F1526)',
+                    border: '1px solid var(--border-color, #1E293B)',
+                    color: 'var(--text-color, #E2E8F0)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     textDecoration: 'none',
-                    transition: 'background-color 0.2s',
+                    transition: 'all 0.2s ease',
                   }}
+                  className="hover:border-amber-500 hover:text-amber-400"
                 >
                   {social.icon}
                 </a>
@@ -124,62 +132,101 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
+          {/* Column 2: Intelligence & Media */}
           <div>
             <h4
               style={{
-                color: '#ffffff',
-                fontSize: '13px',
+                color: 'var(--heading-color, #FFFFFF)',
+                fontSize: '12px',
                 fontWeight: '700',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                margin: '0 0 20px 0',
+                margin: '0 0 16px 0',
               }}
             >
-              Quick Links
+              Intelligence Hub
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link href="/articles" style={{ textDecoration: 'none', color: '#a3a3a3' }}>
-                Analysis
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <Link href="/articles" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Strategic Briefings
               </Link>
-              <Link href="/videos" style={{ textDecoration: 'none', color: '#a3a3a3' }}>
-                Videos
+              <Link href="/videos" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Video Broadcasts
               </Link>
-              <Link href="/events" style={{ textDecoration: 'none', color: '#a3a3a3' }}>
-                Events
+              <Link href="/events" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Conclaves & Summits
               </Link>
-              <Link href="/soldiers" style={{ textDecoration: 'none', color: '#a3a3a3' }}>
-                Roll of Honour
+              <Link href="/gallery" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Photo Archival Gallery
               </Link>
             </div>
           </div>
 
-          {/* Column 3: Contact Channels */}
+          {/* Column 3: Armed Forces & Community */}
           <div>
             <h4
               style={{
-                color: '#ffffff',
-                fontSize: '13px',
+                color: 'var(--heading-color, #FFFFFF)',
+                fontSize: '12px',
                 fontWeight: '700',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
-                margin: '0 0 20px 0',
+                margin: '0 0 16px 0',
               }}
             >
-              Contact
+              Armed Forces & Store
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link href="/contact" style={{ textDecoration: 'none', color: '#a3a3a3' }}>
-                Media Inquiries
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <Link href="/soldiers" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Know Your Soldiers (Honour Roll)
               </Link>
-              <Link href="/contact" style={{ textDecoration: 'none', color: '#a3a3a3' }}>
-                Speaking Events
+              <Link href="/merchandise" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Official MMK Store
               </Link>
-              <Link href="/contact" style={{ textDecoration: 'none', color: '#a3a3a3' }}>
-                Consultancy
+              <Link href="/about" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Career & Biography
               </Link>
-              <Link href="/contact" style={{ textDecoration: 'none', color: '#a3a3a3' }}>
-                Newsletter
+              <Link href="/contact" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Contact & Speaking Invites
+              </Link>
+            </div>
+          </div>
+
+          {/* Column 4: Platform Operations */}
+          <div>
+            <h4
+              style={{
+                color: 'var(--heading-color, #FFFFFF)',
+                fontSize: '12px',
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                margin: '0 0 16px 0',
+              }}
+            >
+              Author Works & Admin
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <a
+                href="https://www.amazon.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                className="hover:text-amber-400 transition-colors"
+              >
+                Operation Sindoor Book <ExternalLink size={11} />
+              </a>
+              <a
+                href="https://www.youtube.com/@MajorMadhanKumar"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                className="hover:text-amber-400 transition-colors"
+              >
+                Making The Unbreakable Series <ExternalLink size={11} />
+              </a>
+              <Link href="/admin" style={{ textDecoration: 'none', color: 'var(--muted-text, #94A3B8)' }} className="hover:text-amber-400 transition-colors">
+                Payload CMS Admin
               </Link>
             </div>
           </div>
@@ -188,19 +235,27 @@ export default function Footer() {
         {/* Bottom Bar Content */}
         <div
           style={{
-            borderTop: '1px solid #262626',
-            paddingTop: '24px',
+            borderTop: '1px solid var(--border-color, #1E293B)',
+            paddingTop: '20px',
             display: 'flex',
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: '13px',
-            color: '#737373',
+            fontSize: '12.5px',
+            color: 'var(--muted-text, #64748B)',
+            gap: '12px',
           }}
         >
-          <p style={{ margin: 0 }}>© {currentYear} Major Madhan Kumar. All rights reserved.</p>
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <span style={{ cursor: 'pointer' }}>Privacy Policy</span>
-            <span style={{ cursor: 'pointer' }}>Terms of Service</span>
+          <p style={{ margin: 0 }}>
+            © {currentYear} Major Madhan Kumar (Retd). All defense intelligence dossiers & visual media rights reserved.
+          </p>
+          <div style={{ display: 'flex', gap: '18px' }}>
+            <Link href="/about" style={{ textDecoration: 'none', color: 'inherit' }} className="hover:text-amber-400">
+              Media Kit
+            </Link>
+            <Link href="/contact" style={{ textDecoration: 'none', color: 'inherit' }} className="hover:text-amber-400">
+              Inquiries
+            </Link>
           </div>
         </div>
       </div>

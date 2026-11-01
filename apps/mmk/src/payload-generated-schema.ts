@@ -116,6 +116,26 @@ export const media = sqliteTable(
   ],
 )
 
+export const articles_table_of_contents = sqliteTable(
+  'articles_table_of_contents',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    id: text('id').primaryKey(),
+    label: text('label').notNull(),
+    anchor_id: text('anchor_id').notNull(),
+  },
+  (columns) => [
+    index('articles_table_of_contents_order_idx').on(columns._order),
+    index('articles_table_of_contents_parent_id_idx').on(columns._parentID),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [articles.id],
+      name: 'articles_table_of_contents_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
 export const articles = sqliteTable(
   'articles',
   {
@@ -134,15 +154,22 @@ export const articles = sqliteTable(
       .references(() => media.id, {
         onDelete: 'set null',
       }),
+    meta_title: text('meta_title'),
+    meta_description: text('meta_description'),
+    block_ai_scrapers: integer('block_ai_scrapers', { mode: 'boolean' }).default(true),
     slug: text('slug'),
     status: text('status', { enum: ['draft', 'published', 'archived'] })
       .notNull()
       .default('draft'),
+    author: integer('author_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
     published_at: text('published_at')
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
     is_featured: integer('is_featured', { mode: 'boolean' }).default(false),
     is_breaking: integer('is_breaking', { mode: 'boolean' }).default(false),
+    is_special: integer('is_special', { mode: 'boolean' }).default(false),
     updatedAt: text('updated_at')
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -151,8 +178,16 @@ export const articles = sqliteTable(
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
   },
   (columns) => [
+    index('articles_category_idx').on(columns.category),
+    index('articles_language_idx').on(columns.language),
     index('articles_featured_image_idx').on(columns.featured_image),
     uniqueIndex('articles_slug_idx').on(columns.slug),
+    index('articles_status_idx').on(columns.status),
+    index('articles_author_idx').on(columns.author),
+    index('articles_published_at_idx').on(columns.published_at),
+    index('articles_is_featured_idx').on(columns.is_featured),
+    index('articles_is_breaking_idx').on(columns.is_breaking),
+    index('articles_is_special_idx').on(columns.is_special),
     index('articles_updated_at_idx').on(columns.updatedAt),
     index('articles_created_at_idx').on(columns.createdAt),
   ],
@@ -221,9 +256,6 @@ export const videos = sqliteTable(
     category: text('category', {
       enum: ['geopolitics', 'defence', 'career', 'motivation'],
     }).notNull(),
-    tag: integer('tag_id').references(() => article_tags.id, {
-      onDelete: 'set null',
-    }),
     updatedAt: text('updated_at')
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -233,9 +265,35 @@ export const videos = sqliteTable(
   },
   (columns) => [
     uniqueIndex('videos_youtube_id_idx').on(columns.youtube_id),
-    index('videos_tag_idx').on(columns.tag),
     index('videos_updated_at_idx').on(columns.updatedAt),
     index('videos_created_at_idx').on(columns.createdAt),
+  ],
+)
+
+export const videos_rels = sqliteTable(
+  'videos_rels',
+  {
+    id: integer('id').primaryKey(),
+    order: integer('order'),
+    parent: integer('parent_id').notNull(),
+    path: text('path').notNull(),
+    'article-tagsID': integer('article_tags_id'),
+  },
+  (columns) => [
+    index('videos_rels_order_idx').on(columns.order),
+    index('videos_rels_parent_idx').on(columns.parent),
+    index('videos_rels_path_idx').on(columns.path),
+    index('videos_rels_article_tags_id_idx').on(columns['article-tagsID']),
+    foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [videos.id],
+      name: 'videos_rels_parent_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [columns['article-tagsID']],
+      foreignColumns: [article_tags.id],
+      name: 'videos_rels_article_tags_fk',
+    }).onDelete('cascade'),
   ],
 )
 
@@ -294,6 +352,7 @@ export const events = sqliteTable(
       }),
     location_name: text('location_name').notNull(),
     location_city: text('location_city').notNull(),
+    registration_url: text('registration_url'),
     registration_open: integer('registration_open', { mode: 'boolean' }).default(true),
     event_date: text('event_date')
       .notNull()
@@ -403,6 +462,152 @@ export const contact_submissions = sqliteTable(
   ],
 )
 
+export const ads_targeting_categories = sqliteTable(
+  'ads_targeting_categories',
+  {
+    order: integer('order').notNull(),
+    parent: integer('parent_id').notNull(),
+    value: text('value', { enum: ['geopolitics', 'defense', 'technology'] }),
+    id: integer('id').primaryKey(),
+  },
+  (columns) => [
+    index('ads_targeting_categories_order_idx').on(columns.order),
+    index('ads_targeting_categories_parent_idx').on(columns.parent),
+    foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [ads.id],
+      name: 'ads_targeting_categories_parent_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const ads = sqliteTable(
+  'ads',
+  {
+    id: integer('id').primaryKey(),
+    name: text('name').notNull(),
+    active: integer('active', { mode: 'boolean' }).default(true),
+    adContent_image: integer('ad_content_image_id')
+      .notNull()
+      .references(() => media.id, {
+        onDelete: 'set null',
+      }),
+    adContent_url: text('ad_content_url').notNull(),
+    updatedAt: text('updated_at')
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text('created_at')
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index('ads_ad_content_ad_content_image_idx').on(columns.adContent_image),
+    index('ads_updated_at_idx').on(columns.updatedAt),
+    index('ads_created_at_idx').on(columns.createdAt),
+  ],
+)
+
+export const ads_rels = sqliteTable(
+  'ads_rels',
+  {
+    id: integer('id').primaryKey(),
+    order: integer('order'),
+    parent: integer('parent_id').notNull(),
+    path: text('path').notNull(),
+    'article-tagsID': integer('article_tags_id'),
+  },
+  (columns) => [
+    index('ads_rels_order_idx').on(columns.order),
+    index('ads_rels_parent_idx').on(columns.parent),
+    index('ads_rels_path_idx').on(columns.path),
+    index('ads_rels_article_tags_id_idx').on(columns['article-tagsID']),
+    foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [ads.id],
+      name: 'ads_rels_parent_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [columns['article-tagsID']],
+      foreignColumns: [article_tags.id],
+      name: 'ads_rels_article_tags_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const merchandise_sizes = sqliteTable(
+  'merchandise_sizes',
+  {
+    order: integer('order').notNull(),
+    parent: integer('parent_id').notNull(),
+    value: text('value', { enum: ['free_size', 'S', 'M', 'L', 'XL', 'XXL'] }),
+    id: integer('id').primaryKey(),
+  },
+  (columns) => [
+    index('merchandise_sizes_order_idx').on(columns.order),
+    index('merchandise_sizes_parent_idx').on(columns.parent),
+    foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [merchandise.id],
+      name: 'merchandise_sizes_parent_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const merchandise = sqliteTable(
+  'merchandise',
+  {
+    id: integer('id').primaryKey(),
+    title: text('title').notNull(),
+    description: text('description'),
+    price: numeric('price', { mode: 'number' }).notNull(),
+    external_buy_url: text('external_buy_url'),
+    slug: text('slug'),
+    status: text('status', { enum: ['draft', 'published', 'archived'] })
+      .notNull()
+      .default('published'),
+    in_stock: integer('in_stock', { mode: 'boolean' }).default(true),
+    is_featured: integer('is_featured', { mode: 'boolean' }).default(false),
+    updatedAt: text('updated_at')
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text('created_at')
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    uniqueIndex('merchandise_slug_idx').on(columns.slug),
+    index('merchandise_updated_at_idx').on(columns.updatedAt),
+    index('merchandise_created_at_idx').on(columns.createdAt),
+  ],
+)
+
+export const merchandise_rels = sqliteTable(
+  'merchandise_rels',
+  {
+    id: integer('id').primaryKey(),
+    order: integer('order'),
+    parent: integer('parent_id').notNull(),
+    path: text('path').notNull(),
+    mediaID: integer('media_id'),
+  },
+  (columns) => [
+    index('merchandise_rels_order_idx').on(columns.order),
+    index('merchandise_rels_parent_idx').on(columns.parent),
+    index('merchandise_rels_path_idx').on(columns.path),
+    index('merchandise_rels_media_id_idx').on(columns.mediaID),
+    foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [merchandise.id],
+      name: 'merchandise_rels_parent_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [columns['mediaID']],
+      foreignColumns: [media.id],
+      name: 'merchandise_rels_media_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
 export const payload_kv = sqliteTable(
   'payload_kv',
   {
@@ -449,6 +654,8 @@ export const payload_locked_documents_rels = sqliteTable(
     'gallery-albumsID': integer('gallery_albums_id'),
     'gallery-photosID': integer('gallery_photos_id'),
     'contact-submissionsID': integer('contact_submissions_id'),
+    adsID: integer('ads_id'),
+    merchandiseID: integer('merchandise_id'),
   },
   (columns) => [
     index('payload_locked_documents_rels_order_idx').on(columns.order),
@@ -466,6 +673,8 @@ export const payload_locked_documents_rels = sqliteTable(
     index('payload_locked_documents_rels_contact_submissions_id_idx').on(
       columns['contact-submissionsID'],
     ),
+    index('payload_locked_documents_rels_ads_id_idx').on(columns.adsID),
+    index('payload_locked_documents_rels_merchandise_id_idx').on(columns.merchandiseID),
     foreignKey({
       columns: [columns['parent']],
       foreignColumns: [payload_locked_documents.id],
@@ -520,6 +729,16 @@ export const payload_locked_documents_rels = sqliteTable(
       columns: [columns['contact-submissionsID']],
       foreignColumns: [contact_submissions.id],
       name: 'payload_locked_documents_rels_contact_submissions_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [columns['adsID']],
+      foreignColumns: [ads.id],
+      name: 'payload_locked_documents_rels_ads_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [columns['merchandiseID']],
+      foreignColumns: [merchandise.id],
+      name: 'payload_locked_documents_rels_merchandise_fk',
     }).onDelete('cascade'),
   ],
 )
@@ -590,20 +809,69 @@ export const payload_migrations = sqliteTable(
   ],
 )
 
-export const site_settings = sqliteTable('site_settings', {
-  id: integer('id').primaryKey(),
-  site_name: text('site_name').notNull().default('Major Madhan Kumar'),
-  tagline: text('tagline').notNull(),
-  short_bio_english: text('short_bio_english').notNull(),
-  short_bio_tamil: text('short_bio_tamil').notNull(),
-  contact_email: text('contact_email').notNull(),
-  social_urls_youtube: text('social_urls_youtube'),
-  social_urls_twitter_x: text('social_urls_twitter_x'),
-  social_urls_instagram: text('social_urls_instagram'),
-  social_urls_facebook: text('social_urls_facebook'),
-  updatedAt: text('updated_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-  createdAt: text('created_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-})
+export const site_settings = sqliteTable(
+  'site_settings',
+  {
+    id: integer('id').primaryKey(),
+    site_name: text('site_name').notNull().default('Major Madhan Kumar'),
+    tagline: text('tagline').notNull(),
+    short_bio_english: text('short_bio_english').notNull(),
+    short_bio_tamil: text('short_bio_tamil').notNull(),
+    contact_email: text('contact_email').notNull(),
+    social_urls_youtube: text('social_urls_youtube'),
+    social_urls_twitter_x: text('social_urls_twitter_x'),
+    social_urls_instagram: text('social_urls_instagram'),
+    social_urls_facebook: text('social_urls_facebook'),
+    book_promo_enabled: integer('book_promo_enabled', { mode: 'boolean' }).default(true),
+    book_promo_title: text('book_promo_title').default('Operation Sindoor – The Untold Story'),
+    book_promo_description: text('book_promo_description').default(
+      'Read the untold story behind Operation Sindoor.',
+    ),
+    book_promo_cover_image: integer('book_promo_cover_image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    book_promo_custom_cover_url: text('book_promo_custom_cover_url').default(
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=600',
+    ),
+    book_promo_affiliate_url: text('book_promo_affiliate_url')
+      .notNull()
+      .default('https://www.amazon.in/'),
+    book_promo_cta_text: text('book_promo_cta_text').default('Buy the Book'),
+    book_promo_disclosure: text('book_promo_disclosure').default(
+      'Purchase through our affiliate link.',
+    ),
+    doc_promo_enabled: integer('doc_promo_enabled', { mode: 'boolean' }).default(true),
+    doc_promo_title: text('doc_promo_title').default('Making The Unbreakable'),
+    doc_promo_subtitle: text('doc_promo_subtitle').default(
+      "India's 1st Digital Series on the Indian Army",
+    ),
+    doc_promo_description: text('doc_promo_description').default(
+      "India's landmark digital series taking you behind the lines with the Indian Armed Forces. Experience the grit, dedication, and operational valor.",
+    ),
+    doc_promo_thumbnail_image: integer('doc_promo_thumbnail_image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    doc_promo_custom_thumbnail_url: text('doc_promo_custom_thumbnail_url').default(
+      'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&q=80&w=800',
+    ),
+    doc_promo_trailer_youtube_id: text('doc_promo_trailer_youtube_id').default('dQw4w9WgXcQ'),
+    doc_promo_youtube_url: text('doc_promo_youtube_url')
+      .notNull()
+      .default('https://www.youtube.com/@MajorMadhanKumar'),
+    doc_promo_cta_text: text('doc_promo_cta_text').default('Watch Documentary'),
+    doc_promo_episode_info: text('doc_promo_episode_info').default(
+      'Episode 1 • Streaming on YouTube',
+    ),
+    updatedAt: text('updated_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text('created_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index('site_settings_book_promo_book_promo_cover_image_idx').on(columns.book_promo_cover_image),
+    index('site_settings_doc_promo_doc_promo_thumbnail_image_idx').on(
+      columns.doc_promo_thumbnail_image,
+    ),
+  ],
+)
 
 export const relations_users_roles = relations(users_roles, ({ one }) => ({
   parent: one(users, {
@@ -628,6 +896,16 @@ export const relations_users = relations(users, ({ many }) => ({
   }),
 }))
 export const relations_media = relations(media, () => ({}))
+export const relations_articles_table_of_contents = relations(
+  articles_table_of_contents,
+  ({ one }) => ({
+    _parentID: one(articles, {
+      fields: [articles_table_of_contents._parentID],
+      references: [articles.id],
+      relationName: 'table_of_contents',
+    }),
+  }),
+)
 export const relations_articles_rels = relations(articles_rels, ({ one }) => ({
   parent: one(articles, {
     fields: [articles_rels.parent],
@@ -646,16 +924,34 @@ export const relations_articles = relations(articles, ({ one, many }) => ({
     references: [media.id],
     relationName: 'featured_image',
   }),
+  table_of_contents: many(articles_table_of_contents, {
+    relationName: 'table_of_contents',
+  }),
+  author: one(users, {
+    fields: [articles.author],
+    references: [users.id],
+    relationName: 'author',
+  }),
   _rels: many(articles_rels, {
     relationName: '_rels',
   }),
 }))
 export const relations_article_tags = relations(article_tags, () => ({}))
-export const relations_videos = relations(videos, ({ one }) => ({
-  tag: one(article_tags, {
-    fields: [videos.tag],
+export const relations_videos_rels = relations(videos_rels, ({ one }) => ({
+  parent: one(videos, {
+    fields: [videos_rels.parent],
+    references: [videos.id],
+    relationName: '_rels',
+  }),
+  'article-tagsID': one(article_tags, {
+    fields: [videos_rels['article-tagsID']],
     references: [article_tags.id],
-    relationName: 'tag',
+    relationName: 'article-tags',
+  }),
+}))
+export const relations_videos = relations(videos, ({ many }) => ({
+  _rels: many(videos_rels, {
+    relationName: '_rels',
   }),
 }))
 export const relations_soldiers = relations(soldiers, ({ one }) => ({
@@ -692,6 +988,68 @@ export const relations_gallery_photos = relations(gallery_photos, ({ one }) => (
   }),
 }))
 export const relations_contact_submissions = relations(contact_submissions, () => ({}))
+export const relations_ads_targeting_categories = relations(
+  ads_targeting_categories,
+  ({ one }) => ({
+    parent: one(ads, {
+      fields: [ads_targeting_categories.parent],
+      references: [ads.id],
+      relationName: 'targeting_categories',
+    }),
+  }),
+)
+export const relations_ads_rels = relations(ads_rels, ({ one }) => ({
+  parent: one(ads, {
+    fields: [ads_rels.parent],
+    references: [ads.id],
+    relationName: '_rels',
+  }),
+  'article-tagsID': one(article_tags, {
+    fields: [ads_rels['article-tagsID']],
+    references: [article_tags.id],
+    relationName: 'article-tags',
+  }),
+}))
+export const relations_ads = relations(ads, ({ one, many }) => ({
+  targeting_categories: many(ads_targeting_categories, {
+    relationName: 'targeting_categories',
+  }),
+  adContent_image: one(media, {
+    fields: [ads.adContent_image],
+    references: [media.id],
+    relationName: 'adContent_image',
+  }),
+  _rels: many(ads_rels, {
+    relationName: '_rels',
+  }),
+}))
+export const relations_merchandise_sizes = relations(merchandise_sizes, ({ one }) => ({
+  parent: one(merchandise, {
+    fields: [merchandise_sizes.parent],
+    references: [merchandise.id],
+    relationName: 'sizes',
+  }),
+}))
+export const relations_merchandise_rels = relations(merchandise_rels, ({ one }) => ({
+  parent: one(merchandise, {
+    fields: [merchandise_rels.parent],
+    references: [merchandise.id],
+    relationName: '_rels',
+  }),
+  mediaID: one(media, {
+    fields: [merchandise_rels.mediaID],
+    references: [media.id],
+    relationName: 'media',
+  }),
+}))
+export const relations_merchandise = relations(merchandise, ({ many }) => ({
+  sizes: many(merchandise_sizes, {
+    relationName: 'sizes',
+  }),
+  _rels: many(merchandise_rels, {
+    relationName: '_rels',
+  }),
+}))
 export const relations_payload_kv = relations(payload_kv, () => ({}))
 export const relations_payload_locked_documents_rels = relations(
   payload_locked_documents_rels,
@@ -751,6 +1109,16 @@ export const relations_payload_locked_documents_rels = relations(
       references: [contact_submissions.id],
       relationName: 'contact-submissions',
     }),
+    adsID: one(ads, {
+      fields: [payload_locked_documents_rels.adsID],
+      references: [ads.id],
+      relationName: 'ads',
+    }),
+    merchandiseID: one(merchandise, {
+      fields: [payload_locked_documents_rels.merchandiseID],
+      references: [merchandise.id],
+      relationName: 'merchandise',
+    }),
   }),
 )
 export const relations_payload_locked_documents = relations(
@@ -782,22 +1150,41 @@ export const relations_payload_preferences = relations(payload_preferences, ({ m
   }),
 }))
 export const relations_payload_migrations = relations(payload_migrations, () => ({}))
-export const relations_site_settings = relations(site_settings, () => ({}))
+export const relations_site_settings = relations(site_settings, ({ one }) => ({
+  book_promo_cover_image: one(media, {
+    fields: [site_settings.book_promo_cover_image],
+    references: [media.id],
+    relationName: 'book_promo_cover_image',
+  }),
+  doc_promo_thumbnail_image: one(media, {
+    fields: [site_settings.doc_promo_thumbnail_image],
+    references: [media.id],
+    relationName: 'doc_promo_thumbnail_image',
+  }),
+}))
 
 type DatabaseSchema = {
   users_roles: typeof users_roles
   users_sessions: typeof users_sessions
   users: typeof users
   media: typeof media
+  articles_table_of_contents: typeof articles_table_of_contents
   articles: typeof articles
   articles_rels: typeof articles_rels
   article_tags: typeof article_tags
   videos: typeof videos
+  videos_rels: typeof videos_rels
   soldiers: typeof soldiers
   events: typeof events
   gallery_albums: typeof gallery_albums
   gallery_photos: typeof gallery_photos
   contact_submissions: typeof contact_submissions
+  ads_targeting_categories: typeof ads_targeting_categories
+  ads: typeof ads
+  ads_rels: typeof ads_rels
+  merchandise_sizes: typeof merchandise_sizes
+  merchandise: typeof merchandise
+  merchandise_rels: typeof merchandise_rels
   payload_kv: typeof payload_kv
   payload_locked_documents: typeof payload_locked_documents
   payload_locked_documents_rels: typeof payload_locked_documents_rels
@@ -809,15 +1196,23 @@ type DatabaseSchema = {
   relations_users_sessions: typeof relations_users_sessions
   relations_users: typeof relations_users
   relations_media: typeof relations_media
+  relations_articles_table_of_contents: typeof relations_articles_table_of_contents
   relations_articles_rels: typeof relations_articles_rels
   relations_articles: typeof relations_articles
   relations_article_tags: typeof relations_article_tags
+  relations_videos_rels: typeof relations_videos_rels
   relations_videos: typeof relations_videos
   relations_soldiers: typeof relations_soldiers
   relations_events: typeof relations_events
   relations_gallery_albums: typeof relations_gallery_albums
   relations_gallery_photos: typeof relations_gallery_photos
   relations_contact_submissions: typeof relations_contact_submissions
+  relations_ads_targeting_categories: typeof relations_ads_targeting_categories
+  relations_ads_rels: typeof relations_ads_rels
+  relations_ads: typeof relations_ads
+  relations_merchandise_sizes: typeof relations_merchandise_sizes
+  relations_merchandise_rels: typeof relations_merchandise_rels
+  relations_merchandise: typeof relations_merchandise
   relations_payload_kv: typeof relations_payload_kv
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels
   relations_payload_locked_documents: typeof relations_payload_locked_documents

@@ -4,8 +4,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import type { Media, Article, Video, Ad } from '@/payload-types'
 import { Play, Calendar, ListIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useTheme } from '@/context/ThemeContext'
 import AdvancedReaderSettings, { ReadingTheme, FontSizeLevel } from './AdvancedReaderSettings'
 import EditorialContent from './EditorialContent'
+import getCloudinaryUrl from '@/utils/mediaUrl'
 
 interface ArticleReaderViewProps {
   article: Article
@@ -19,7 +21,8 @@ interface ArticleReaderViewProps {
 
 const AdSlot = ({ ad }: { ad: Ad | null }) => {
   const media = typeof ad?.adContent?.image === 'object' ? (ad.adContent.image as Media) : null
-  if (!media?.url) return null
+  const adImgUrl = media ? getCloudinaryUrl(media, 'book-cover') : null
+  if (!adImgUrl) return null
   return (
     <a
       href={ad?.adContent?.url || '#'}
@@ -35,7 +38,7 @@ const AdSlot = ({ ad }: { ad: Ad | null }) => {
       }}
     >
       <img
-        src={media.url}
+        src={adImgUrl}
         alt="Advertisement"
         style={{ width: '100%', height: 'auto', display: 'block' }}
       />
@@ -81,14 +84,23 @@ export default function ArticleReaderView({
     return () => window.removeEventListener('scroll', trackScrollDepth)
   }, [isReadingMode])
 
+  const { theme: globalTheme } = useTheme()
+  const activeReaderTheme = isReadingMode
+    ? theme
+    : globalTheme === 'classic'
+      ? 'classic'
+      : globalTheme === 'dark'
+        ? 'dark'
+        : 'light'
+
   const themeStyles = {
     light: {
       bg: '#ffffff',
-      text: '#2c3e50',
+      text: '#1e293b',
       title: '#0B1D3A',
       cardBg: '#ffffff',
       border: '#e2e8f0',
-      quoteBorder: '#0B1D3A',
+      quoteBorder: '#4B5320',
       strongColor: '#0b1d3a',
     },
     sepia: {
@@ -106,10 +118,19 @@ export default function ArticleReaderView({
       title: '#f8fafc',
       cardBg: '#1e293b',
       border: '#334155',
-      quoteBorder: '#fbbf24',
+      quoteBorder: '#38bdf8',
       strongColor: '#ffffff',
     },
-  }[isReadingMode ? theme : 'light']
+    classic: {
+      bg: '#070A14',
+      text: '#cbd5e1',
+      title: '#f8fafc',
+      cardBg: '#0F1526',
+      border: '#1E293B',
+      quoteBorder: '#656E36',
+      strongColor: '#ffffff',
+    },
+  }[activeReaderTheme]
 
   const sizeStyles = {
     sm: { text: '16px', title: '32px', sectionHeading: '22px', lineSpacing: '1.8' },
@@ -288,9 +309,9 @@ export default function ArticleReaderView({
             </div>
           )}
 
-          {image?.url && (
+          {image && (
             <img
-              src={image.url}
+              src={getCloudinaryUrl(image, 'drone-shield')}
               alt={article.title}
               style={{
                 width: '100%',

@@ -1,9 +1,67 @@
 import { getPayload } from 'payload'
 import configPromise from '@/payload.config'
 import { notFound } from 'next/navigation'
-import type { Media, Video, Ad, Article } from '@/payload-types'
+import type { Metadata } from 'next'
+import type { Media, Video, Article } from '@/payload-types'
 import { format } from 'date-fns'
 import ArticleReaderView from '@/components/ArticleReaderView'
+import { getCloudinaryUrl } from '@/utils/mediaUrl'
+
+export const revalidate = 60
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const payload = await getPayload({ config: configPromise })
+
+  const articleResult = await payload.find({
+    collection: 'articles',
+    where: { slug: { equals: slug }, status: { equals: 'published' } },
+    depth: 1,
+    limit: 1,
+  })
+
+  const article = articleResult.docs[0]
+  if (!article) {
+    return {
+      title: 'Strategic Briefing Not Found',
+    }
+  }
+
+  const imageUrl = getCloudinaryUrl(article.featured_image, 'drone-shield')
+  const description =
+    article.excerpt ||
+    'In-depth defense intelligence and geopolitical assessment by veteran Indian Army officer Major Madhan Kumar.'
+
+  return {
+    title: article.title,
+    description,
+    openGraph: {
+      title: article.title,
+      description,
+      type: 'article',
+      publishedTime: article.published_at || undefined,
+      authors: ['Major Madhan Kumar (Retd)'],
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description,
+      images: [imageUrl],
+    },
+  }
+}
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -73,16 +131,46 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     ? format(new Date(article.published_at), 'MMMM dd, yyyy')
     : 'Date Unavailable'
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: article.title,
+    description: article.excerpt || article.title,
+    image: [getCloudinaryUrl(article.featured_image, 'drone-shield')],
+    datePublished: article.published_at,
+    dateModified: article.updatedAt,
+    author: {
+      '@type': 'Person',
+      name: 'Major Madhan Kumar (Retd)',
+      jobTitle: 'Defense Analyst & Geopolitical Strategist',
+      url: 'https://majormadhankumar.in/about',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Major Madhan Kumar',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://res.cloudinary.com/dsvqz4afr/image/upload/f_webp,q_auto/payload-media/major-madhan.webp',
+      },
+    },
+  }
+
   // ⚡ Final check: ensure body exists before passing to client component
   return (
-    <ArticleReaderView
-      article={article}
-      formattedDate={formattedDate}
-      image={image}
-      matchedVideo={matchedVideo}
-      adsData={targetAd}
-      relatedArticles={relatedArticles.docs as Article[]}
-      recommendedVideos={recommendedVideos.docs as Video[]}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ArticleReaderView
+        article={article}
+        formattedDate={formattedDate}
+        image={image}
+        matchedVideo={matchedVideo}
+        adsData={targetAd}
+        relatedArticles={relatedArticles.docs as Article[]}
+        recommendedVideos={recommendedVideos.docs as Video[]}
+      />
+    </>
   )
 }

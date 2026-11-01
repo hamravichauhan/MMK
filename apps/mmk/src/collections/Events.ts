@@ -5,7 +5,6 @@ export const Events: CollectionConfig = {
   slug: 'events',
   admin: {
     useAsTitle: 'title',
-    // Configures a crisp, informative grid overview view for the dashboard row layout
     defaultColumns: ['registration_open', 'title', 'event_date', 'location_city', 'updatedAt'],
     group: 'Operational Management',
     listSearchableFields: ['title', 'location_name', 'location_city'],
@@ -23,7 +22,7 @@ export const Events: CollectionConfig = {
   fields: [
     {
       type: 'tabs',
-      tabs: [
+      tabs: [ 
         {
           label: 'Event Info & Media',
           description: 'Draft the public presentation layout, agenda details, and banner visuals.',
@@ -39,7 +38,7 @@ export const Events: CollectionConfig = {
             },
             {
               name: 'description',
-              type: 'richText', // Lexical editor for descriptive write-ups, links, and agendas
+              type: 'richText',
               required: true,
               label: 'Event Description & Detailed Agenda',
             },
@@ -57,7 +56,7 @@ export const Events: CollectionConfig = {
         },
         {
           label: 'Venue Logistics',
-          description: 'Pinpoint precise spatial tracking coordinates for attendees.',
+          description: 'Pinpoint precise spatial tracking coordinates and registration handling for attendees.',
           fields: [
             {
               type: 'row',
@@ -84,6 +83,21 @@ export const Events: CollectionConfig = {
                 },
               ],
             },
+            {
+              name: 'registration_url',
+              type: 'text',
+              label: 'External Registration Website URL',
+              admin: {
+                placeholder: 'https://external-booking-portal.com/events/join',
+                description: 'Provide the destination web link where users fill out forms or clear booking passes.',
+                condition: (data) => Boolean(data?.registration_open), // Only shows up when registration is active
+              },
+              validate: (val: any) => {
+                if (!val) return true;
+                if (typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'))) return true;
+                return 'Please input a valid URL starting with http:// or https://';
+              }
+            },
           ],
         },
       ],
@@ -99,7 +113,7 @@ export const Events: CollectionConfig = {
       label: '🟢 Accept Public Registrations (Form Open)',
       admin: {
         position: 'sidebar',
-        description: 'Toggling this off instantly updates the public tag banner to CLOSED.',
+        description: 'Toggling this off instantly updates the public tag banner to CLOSED and hides the portal routing line.',
       },
     },
     {
@@ -112,7 +126,7 @@ export const Events: CollectionConfig = {
         description: 'Set exactly when the live transmission or speech kicks off.',
         date: {
           pickerAppearance: 'dayAndTime',
-          timeIntervals: 15, // Smooths scheduling to 15-minute standard increments
+          timeIntervals: 15,
         },
       },
     },

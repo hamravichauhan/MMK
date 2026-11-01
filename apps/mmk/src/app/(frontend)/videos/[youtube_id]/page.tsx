@@ -1,9 +1,10 @@
 import { getPayload } from 'payload'
 import configPromise from '@/payload.config'
 import { notFound } from 'next/navigation'
-import type { Media, ArticleTag, Video, Article } from '@/payload-types'
+import type { ArticleTag, Video, Article } from '@/payload-types'
 import Link from 'next/link'
-import { Play, ArrowLeft, Calendar, FileText, Film } from 'lucide-react'
+import { Play, ArrowLeft, FileText, Film } from 'lucide-react'
+import HomeThemeWrapper from '@/components/layout/HomeThemeWrapper'
 
 interface PageProps {
   params: Promise<{ youtube_id: string }>
@@ -79,15 +80,14 @@ export default async function WatchVideoPage({ params }: PageProps) {
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        backgroundColor: '#fcfcfc',
-        padding: '40px 0',
-        fontFamily: '"Inter", system-ui, sans-serif',
-      }}
-    >
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 20px' }}>
+    <HomeThemeWrapper breakingNewsTrack={null} trendingNavTrack={null}>
+      <main
+        style={{
+          maxWidth: '1000px',
+          margin: '0 auto',
+          padding: '40px 24px 80px',
+        }}
+      >
         {/* Back Link Anchor Navigation */}
         <Link
           href="/videos"
@@ -95,10 +95,10 @@ export default async function WatchVideoPage({ params }: PageProps) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            color: '#4B5320',
+            color: 'var(--accent-color, #656E36)',
             textDecoration: 'none',
             fontSize: '14px',
-            fontWeight: '600',
+            fontWeight: 600,
             marginBottom: '24px',
           }}
         >
@@ -108,11 +108,11 @@ export default async function WatchVideoPage({ params }: PageProps) {
         {/* 📺 MAIN THEATRE FRAME AND CONTENT DISPLAY CARD */}
         <div
           style={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.03)',
+            backgroundColor: 'var(--card-bg, #0F1526)',
+            border: '1px solid var(--border-color, #1E293B)',
+            borderRadius: '12px',
+            padding: '28px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
             marginBottom: '48px',
           }}
         >
@@ -123,10 +123,10 @@ export default async function WatchVideoPage({ params }: PageProps) {
               paddingBottom: '56.25%',
               height: 0,
               overflow: 'hidden',
-              borderRadius: '10px',
+              borderRadius: '8px',
               backgroundColor: '#000',
-              marginBottom: '28px',
-              boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+              marginBottom: '24px',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
             }}
           >
             <iframe
@@ -153,12 +153,13 @@ export default async function WatchVideoPage({ params }: PageProps) {
               style={{
                 textTransform: 'uppercase',
                 fontSize: '11px',
-                fontWeight: '700',
+                fontWeight: 700,
                 padding: '5px 12px',
                 borderRadius: '4px',
-                backgroundColor: '#4B5320',
-                color: '#ffffff',
-                letterSpacing: '0.5px',
+                backgroundColor: 'rgba(101, 110, 54, 0.15)',
+                border: '1px solid var(--accent-color, #656E36)',
+                color: 'var(--accent-color, #656E36)',
+                letterSpacing: '0.05em',
               }}
             >
               {video.category}
@@ -166,8 +167,8 @@ export default async function WatchVideoPage({ params }: PageProps) {
             <span
               style={{
                 fontSize: '13px',
-                color: '#16a34a',
-                fontWeight: '600',
+                color: '#22c55e',
+                fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
@@ -179,9 +180,9 @@ export default async function WatchVideoPage({ params }: PageProps) {
                   width: '8px',
                   height: '8px',
                   borderRadius: '50%',
-                  backgroundColor: '#16a34a',
+                  backgroundColor: '#22c55e',
                 }}
-              ></span>
+              />
               Intelligence Briefing
             </span>
           </div>
@@ -190,9 +191,9 @@ export default async function WatchVideoPage({ params }: PageProps) {
           <h1
             style={{
               fontFamily: '"Playfair Display", Georgia, serif',
-              fontSize: '32px',
-              fontWeight: '800',
-              color: '#0B1D3A',
+              fontSize: 'clamp(24px, 3.5vw, 32px)',
+              fontWeight: 800,
+              color: 'var(--text-color, #E2E8F0)',
               margin: '0 0 16px 0',
               lineHeight: '1.3',
             }}
@@ -202,8 +203,8 @@ export default async function WatchVideoPage({ params }: PageProps) {
 
           <p
             style={{
-              color: '#334155',
-              fontSize: '16px',
+              color: 'var(--muted-text, #94A3B8)',
+              fontSize: '15.5px',
               lineHeight: '1.7',
               margin: '0 0 24px 0',
               whiteSpace: 'pre-line',
@@ -219,8 +220,7 @@ export default async function WatchVideoPage({ params }: PageProps) {
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: '8px',
-                pt: '16px',
-                borderTop: '1px solid #f1f5f9',
+                borderTop: '1px solid var(--border-color, #1E293B)',
                 paddingTop: '16px',
               }}
             >
@@ -231,11 +231,12 @@ export default async function WatchVideoPage({ params }: PageProps) {
                     key={tag.id}
                     style={{
                       fontSize: '12px',
-                      color: '#475569',
-                      backgroundColor: '#f1f5f9',
+                      color: 'var(--muted-text, #64748B)',
+                      backgroundColor: 'var(--subtle-bg, #090D1A)',
+                      border: '1px solid var(--border-color, #1E293B)',
                       padding: '4px 10px',
                       borderRadius: '4px',
-                      fontWeight: '500',
+                      fontWeight: 500,
                     }}
                   >
                     #{tag.name}
@@ -246,26 +247,30 @@ export default async function WatchVideoPage({ params }: PageProps) {
           )}
         </div>
 
-        {/* 📄 BOX BLOCK I: CROSS-SUGGESTED INTEL DOCUMENTS (READING GUIDE) */}
+        {/* 📄 BOX BLOCK I: CROSS-SUGGESTED INTEL DOCUMENTS */}
         {crossArticles.length > 0 && (
           <section
-            style={{ borderTop: '1px solid #e2e8f0', paddingTop: '40px', marginBottom: '56px' }}
+            style={{
+              borderTop: '1px solid var(--border-color, #1E293B)',
+              paddingTop: '36px',
+              marginBottom: '48px',
+            }}
           >
             <h3
               style={{
                 fontFamily: '"Playfair Display", Georgia, serif',
-                fontSize: '24px',
-                fontWeight: '700',
-                color: '#0B1D3A',
+                fontSize: '22px',
+                fontWeight: 700,
+                color: 'var(--text-color, #E2E8F0)',
                 marginBottom: '20px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
               }}
             >
-              <FileText size={22} style={{ color: '#4B5320' }} /> Related Tactical Briefing Papers
+              <FileText size={20} color="var(--accent-color, #656E36)" /> Related Tactical Briefing Papers
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {crossArticles.map((article) => (
                 <Link
                   key={article.id}
@@ -273,26 +278,26 @@ export default async function WatchVideoPage({ params }: PageProps) {
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
                   <div
+                    className="editorial-card-item"
                     style={{
                       display: 'flex',
-                      gap: '20px',
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #f1f5f9',
-                      borderRadius: '10px',
+                      gap: '16px',
+                      backgroundColor: 'var(--card-bg, #0F1526)',
+                      border: '1px solid var(--border-color, #1E293B)',
+                      borderRadius: '8px',
                       padding: '16px',
                       alignItems: 'center',
                       cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.01)',
                     }}
                   >
                     <div
                       style={{
-                        backgroundColor: '#f8fafc',
-                        border: '1px solid #cbd5e1',
-                        color: '#0B1D3A',
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '8px',
+                        backgroundColor: 'var(--subtle-bg, #090D1A)',
+                        border: '1px solid var(--border-color, #1E293B)',
+                        color: 'var(--accent-color, #656E36)',
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '6px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -305,9 +310,9 @@ export default async function WatchVideoPage({ params }: PageProps) {
                       <h4
                         style={{
                           margin: '0 0 4px 0',
-                          fontSize: '16px',
-                          fontWeight: '700',
-                          color: '#0B1D3A',
+                          fontSize: '15.5px',
+                          fontWeight: 700,
+                          color: 'var(--text-color, #E2E8F0)',
                         }}
                       >
                         {article.title}
@@ -316,7 +321,7 @@ export default async function WatchVideoPage({ params }: PageProps) {
                         style={{
                           margin: 0,
                           fontSize: '13px',
-                          color: '#64748b',
+                          color: 'var(--muted-text, #64748B)',
                           display: '-webkit-box',
                           WebkitLineClamp: 1,
                           WebkitBoxOrient: 'vertical',
@@ -328,10 +333,11 @@ export default async function WatchVideoPage({ params }: PageProps) {
                     </div>
                     <span
                       style={{
-                        fontSize: '14px',
-                        fontWeight: '700',
-                        color: '#4B5320',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        color: 'var(--accent-color, #656E36)',
                         paddingRight: '8px',
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       Read Paper ➔
@@ -345,26 +351,31 @@ export default async function WatchVideoPage({ params }: PageProps) {
 
         {/* 🎬 BOX BLOCK II: RELATED VIDEOS GRID */}
         {relatedVideos.length > 0 && (
-          <section style={{ borderTop: '1px solid #e2e8f0', paddingTop: '40px' }}>
+          <section
+            style={{
+              borderTop: '1px solid var(--border-color, #1E293B)',
+              paddingTop: '36px',
+            }}
+          >
             <h3
               style={{
                 fontFamily: '"Playfair Display", Georgia, serif',
-                fontSize: '24px',
-                fontWeight: '700',
-                color: '#0B1D3A',
-                marginBottom: '24px',
+                fontSize: '22px',
+                fontWeight: 700,
+                color: 'var(--text-color, #E2E8F0)',
+                marginBottom: '20px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
               }}
             >
-              <Film size={22} style={{ color: '#4B5320' }} /> Recommended Video Broadcasts
+              <Film size={20} color="var(--accent-color, #656E36)" /> Recommended Video Broadcasts
             </h3>
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-                gap: '24px',
+                gap: '20px',
               }}
             >
               {relatedVideos.map((relVideo) => {
@@ -377,12 +388,12 @@ export default async function WatchVideoPage({ params }: PageProps) {
                     style={{ textDecoration: 'none', color: 'inherit' }}
                   >
                     <div
+                      className="video-card-item"
                       style={{
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #f1f5f9',
-                        borderRadius: '12px',
+                        backgroundColor: 'var(--card-bg, #0F1526)',
+                        border: '1px solid var(--border-color, #1E293B)',
+                        borderRadius: '8px',
                         overflow: 'hidden',
-                        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.01)',
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
@@ -414,7 +425,7 @@ export default async function WatchVideoPage({ params }: PageProps) {
                             top: '50%',
                             left: '50%',
                             transform: 'translate(-50%, -50%)',
-                            backgroundColor: 'rgba(11, 29, 58, 0.85)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
                             width: '36px',
                             height: '36px',
                             borderRadius: '50%',
@@ -429,15 +440,15 @@ export default async function WatchVideoPage({ params }: PageProps) {
                         <span
                           style={{
                             position: 'absolute',
-                            top: '12px',
-                            left: '12px',
-                            backgroundColor: '#4B5320',
+                            top: '10px',
+                            left: '10px',
+                            backgroundColor: 'var(--accent-color, #656E36)',
                             color: '#ffffff',
                             fontSize: '10px',
-                            fontWeight: 'bold',
+                            fontWeight: 700,
                             textTransform: 'uppercase',
                             padding: '3px 8px',
-                            borderRadius: '4px',
+                            borderRadius: '3px',
                           }}
                         >
                           {relVideo.category}
@@ -450,8 +461,8 @@ export default async function WatchVideoPage({ params }: PageProps) {
                           style={{
                             fontFamily: '"Playfair Display", Georgia, serif',
                             fontSize: '15px',
-                            fontWeight: '700',
-                            color: '#0B1D3A',
+                            fontWeight: 700,
+                            color: 'var(--text-color, #E2E8F0)',
                             margin: '0 0 6px 0',
                             lineHeight: '1.4',
                           }}
@@ -460,7 +471,7 @@ export default async function WatchVideoPage({ params }: PageProps) {
                         </h4>
                         <p
                           style={{
-                            color: '#64748b',
+                            color: 'var(--muted-text, #64748B)',
                             fontSize: '12.5px',
                             margin: 0,
                             display: '-webkit-box',
@@ -480,7 +491,7 @@ export default async function WatchVideoPage({ params }: PageProps) {
             </div>
           </section>
         )}
-      </div>
-    </main>
+      </main>
+    </HomeThemeWrapper>
   )
 }

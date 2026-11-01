@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 
 export const HeroNewsGrid = ({ articles }: { articles: any[] }) => {
   if (!articles || articles.length === 0) {

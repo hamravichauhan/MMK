@@ -22,6 +22,7 @@ import { GalleryAlbums } from './collections/GalleryAlbums'
 import { GalleryPhotos } from './collections/GalleryPhotos'
 import { ContactSubmissions } from './collections/ContactSubmissions'
 import {Ads} from './collections/Ads'
+import { Merchandise } from './collections/Merchandise'
 
 // Globals
 import { SiteSettings } from './globals/SiteSettings'
@@ -46,7 +47,8 @@ const cloudinaryAdapter: Adapter = () => {
         {
           folder: CLOUDINARY_FOLDER,
           public_id: fileBaseName,
-          resource_type: 'auto',
+          format: 'webp',
+          resource_type: 'image',
           overwrite: true,
         },
         (error, result) => {
@@ -72,9 +74,12 @@ const cloudinaryAdapter: Adapter = () => {
   }
 
   const generateURL: GenerateURL = ({ filename }) => {
-    const fileBaseName = filename.split('.')[0]
+    const fileBaseName = filename.replace(/\.(webp|jpg|jpeg|png|avif|gif)$/i, '')
     return cloudinary.url(`${CLOUDINARY_FOLDER}/${fileBaseName}`, { 
       secure: true,
+      format: 'webp',
+      fetch_format: 'webp',
+      quality: 'auto',
       resource_type: 'image'
     })
   }
@@ -86,11 +91,17 @@ const cloudinaryAdapter: Adapter = () => {
         return new Response('Not Found', { status: 404 })
       }
 
-      const fileBaseName = filename.split('.')[0]
-      const cloudUrl = cloudinary.url(`${CLOUDINARY_FOLDER}/${fileBaseName}`, { secure: true })
+      const fileBaseName = filename.replace(/\.(webp|jpg|jpeg|png|avif|gif)$/i, '')
+      const cloudUrl = cloudinary.url(`${CLOUDINARY_FOLDER}/${fileBaseName}`, { 
+        secure: true,
+        format: 'webp',
+        fetch_format: 'webp',
+        quality: 'auto',
+        resource_type: 'image'
+      })
       
       return Response.redirect(cloudUrl, 302)
-    } catch (err) {
+    } catch (_err) {
       return new Response('Internal Server Error', { status: 500 })
     }
   }
@@ -116,6 +127,15 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      graphics: {
+        Logo: '/components/admin/AdminLogo#AdminLogo',
+        Icon: '/components/admin/AdminIcon#AdminIcon',
+      },
+      beforeDashboard: [
+        '/components/admin/AdminDashboardHeader#AdminDashboardHeader',
+      ],
+    },
   },
   
   collections: [
@@ -129,7 +149,8 @@ export default buildConfig({
     GalleryAlbums,
     GalleryPhotos,
     ContactSubmissions,
-    Ads
+    Ads,
+    Merchandise,
   ],
   
   globals: [SiteSettings,],
@@ -150,6 +171,7 @@ export default buildConfig({
         media: {
           adapter: cloudinaryAdapter,
           disableLocalStorage: true,
+          disablePayloadAccessControl: true,
         },
       },
     }),
